@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Bia Cardeal Beauty | Agendamento Online</title>
+    
+    <!-- Script para carregar a foto instantaneamente do navegador (Zero delay/branco) -->
+    <script>
+        const cachedLogo = localStorage.getItem('studio_logo_url');
+        if (cachedLogo) {
+            document.addEventListener('DOMContentLoaded', () => {
+                const navLogo = document.getElementById('nav-logo-img');
+                const heroProfile = document.getElementById('hero-profile-img');
+                if (navLogo) navLogo.src = cachedLogo;
+                if (heroProfile) heroProfile.src = cachedLogo;
+            });
+        }
+    </script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nude: {
+                            50: '#FDFBF9',
+                            100: '#BBA393',
+                            200: '#E2C7B8',
+                            300: '#D4B29E',
+                            800: '#5C333E',
+                            900: '#2B0C14',
+                        },
+                        rosegold: {
+                            light: '#F4D4CC',
+                            DEFAULT: '#C89684',
+                            dark: '#9E6D5B'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome para Ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-nude-100 text-nude-900 font-sans min-h-full flex flex-col antialiased selection:bg-rosegold-light selection:text-nude-900">
+
+    <!-- Topbar de Navegação / Admin Trigger -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-nude-200 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 h-20 flex items-center justify-between">
+            <a href="#" onclick="mudarVisao('site')" class="flex items-center gap-3 group">
+                <div class="w-12 h-12 rounded-full overflow-hidden border-2 border-rosegold shadow-sm bg-nude-50">
+                    <img id="nav-logo-img" src="" alt="Bia Cardeal" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h1 id="nav-studio-name" class="font-serif font-bold text-xl tracking-wide group-hover:text-rosegold-dark transition-colors">Bia Cardeal Beauty</h1>
+                    <p id="nav-studio-sub" class="text-xs text-nude-800 tracking-wider uppercase">Lash & Brow Specialist</p>
+                </div>
+            </a>
+
+            <div class="flex items-center gap-3">
+                <button onclick="abrirAdminLogin()" class="px-4 py-2 text-xs font-semibold uppercase tracking-wider rounded-full border border-rosegold text-nude-900 hover:bg-nude-800 hover:text-white transition-all flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-lock text-rosegold"></i> Acesso ao Studio
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL: SITE -->
+    <main id="view-site" class="flex-grow">
+        <!-- Hero Section -->
+        <section class="py-12 px-4 bg-gradient-to-b from-white to-nude-100 border-b border-nude-200">
+            <div class="max-w-4xl mx-auto bg-white rounded-3xl p-6 sm:p-10 shadow-xl shadow-rosegold/5 border border-nude-200 flex flex-col md:flex-row items-center gap-8">
+                <div class="relative">
+                    <div class="w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden border-4 border-nude-100 shadow-lg bg-nude-50">
+                        <img id="hero-profile-img" src="" alt="Bia Cardeal" class="w-full h-full object-cover">
+                    </div>
+                    <div class="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-md text-rosegold border border-nude-200">
+                        <i class="fa-solid fa-award text-lg"></i>
+                    </div>
+                </div>
+                <div class="text-center md:text-left flex-1">
+                    <span id="hero-tag" class="text-xs font-bold uppercase tracking-widest text-rosegold-dark bg-nude-100 px-3 py-1 rounded-full">Lash & Brow Specialist</span>
+                    <h2 id="hero-title" class="font-serif text-3xl sm:text-4xl font-bold mt-3 mb-2 text-nude-900">Studio Bia Cardeal Beauty</h2>
+                    <p id="hero-desc" class="text-neutral-700 text-sm sm:text-base leading-relaxed mb-4">Especialista em realçar a beleza do olhar com delicadeza, segurança e alta precisão. Nosso studio foi preparado para te oferecer uma experiência relaxante e inesquecível.</p>
+                    <div class="flex flex-wrap justify-center md:justify-start gap-4 text-xs font-medium text-nude-800">
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-rosegold"></i> <span id="info-endereco">Salvador – BA</span></span>
+                        <span class="flex items-center gap-1.5"><i class="fa-solid fa-shield-heart text-rosegold"></i> Materiais Esterilizados</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção de Agendamento Passo a Passo -->
+        <section class="max-w-4xl mx-auto px-4 py-12">
+            <div class="text-center mb-10">
+                <h3 class="font-serif text-3xl font-bold">Faça o seu Agendamento</h3>
+                <p class="text-sm text-neutral-600 mt-1">Escolha seus procedimentos favoritos e reserve seu horário em instantes.</p>
+            </div>
+
+            <!-- Indicador de Passos -->
+            <div class="flex justify-center items-center gap-4 mb-10">
+                <div class="flex items-center gap-2">
+                    <span id="step-dot-1" class="w-8 h-8 rounded-full bg-nude-900 text-white flex items-center font-bold text-sm justify-center">1</span>
+                    <span class="text-xs font-bold uppercase tracking-wider hidden sm:inline">Serviços</span>
+                </div>
+                <div class="w-10 h-0.5 bg-nude-200"></div>
+                <div class="flex items-center gap-2">
+                    <span id="step-dot-2" class="w-8 h-8 rounded-full bg-nude-200 text-nude-800 flex items-center font-bold text-sm justify-center">2</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-neutral-400 hidden sm:inline">Data & Hora</span>
+                </div>
+                <div class="w-10 h-0.5 bg-nude-200"></div>
+                <div class="flex items-center gap-2">
+                    <span id="step-dot-3" class="w-8 h-8 rounded-full bg-nude-200 text-nude-800 flex items-center font-bold text-sm justify-center">3</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-neutral-400 hidden sm:inline">Seus Dados</span>
+                </div>
+            </div>
+
+            <!-- ETAPA 1: SELEÇÃO DE SERVIÇOS -->
+            <div id="step-1-container" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="servicos-lista-publica">
+                    <!-- Preenchido via JS -->
+                </div>
+
+                <!-- Resumo flutuante da seleção -->
+                <div id="booking-summary-bar" class="bg-white border border-rosegold/30 rounded-2xl p-5 shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-4 z-40">
+                    <div>
+                        <p class="text-xs uppercase tracking-wider font-semibold text-neutral-500">Serviços Selecionados: <span id="count-selected" class="text-rosegold-dark font-bold text-sm">0</span></p>
+                        <p class="font-serif text-xl font-bold text-nude-900">Total: R$ <span id="total-price">0,00</span> <span class="text-xs font-sans font-normal text-neutral-500">(~<span id="total-duration">0</span> min)</span></p>
+                    </div>
+                    <button onclick="irParaPasso2()" id="btn-avancar-1" disabled class="w-full sm:w-auto px-8 py-3 bg-nude-900 text-white font-semibold rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-rosegold-dark transition-all shadow-md">
+                        Continuar para Data e Hora <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ETAPA 2: DATA E HORA -->
+            <div id="step-2-container" class="hidden space-y-6">
+                <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-md border border-nude-200">
+                    <h4 class="font-serif text-2xl font-bold mb-4">Escolha o Dia e Horário</h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-2">Data do Atendimento</label>
+                            <input type="date" id="input-data" class="w-full p-3.5 rounded-xl border border-nude-200 bg-nude-50 focus:outline-none focus:border-rosegold font-medium" onchange="gerarHorariosDisponiveis()">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-2">Horários Disponíveis</label>
+                            <div id="horarios-grid" class="grid grid-cols-3 gap-2 max-h-56 overflow-y-auto pr-1">
+                                <p class="text-xs text-neutral-400 col-span-3 py-4 text-center">Selecione uma data acima para ver os horários.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-4">
+                    <button onclick="voltarPasso(1)" class="px-6 py-3 rounded-xl border border-nude-300 text-neutral-700 font-semibold text-sm hover:bg-nude-50">
+                        <i class="fa-solid fa-arrow-left mr-2"></i> Voltar
+                    </button>
+                    <button onclick="irParaPasso3()" id="btn-avancar-2" disabled class="px-8 py-3 bg-nude-900 text-white font-semibold rounded-xl text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-rosegold-dark transition-all shadow-md">
+                        Continuar para Dados <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ETAPA 3: DADOS DA CLIENTE -->
+            <div id="step-3-container" class="hidden space-y-6">
+                <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-md border border-nude-200">
+                    <h4 class="font-serif text-2xl font-bold mb-4">Informe seus Dados</h4>
+                    <p class="text-xs text-neutral-500 mb-6">Precisamos destas informações para confirmar seu horário no Studio.</p>
+
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Seu Nome Completo</label>
+                            <input type="text" id="cliente-nome" placeholder="Ex: Maria Clara Santos" class="w-full p-3.5 rounded-xl border border-nude-200 bg-nude-50 focus:outline-none focus:border-rosegold font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Seu WhatsApp com DDD</label>
+                            <input type="tel" id="cliente-whatsapp" placeholder="Ex: (71) 99999-9999" class="w-full p-3.5 rounded-xl border border-nude-200 bg-nude-50 focus:outline-none focus:border-rosegold font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Observações (Opcional)</label>
+                            <textarea id="cliente-obs" rows="2" placeholder="Alguma preferência ou alergia?" class="w-full p-3.5 rounded-xl border border-nude-200 bg-nude-50 focus:outline-none focus:border-rosegold font-medium"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-4">
+                    <button onclick="voltarPasso(2)" class="px-6 py-3 rounded-xl border border-nude-300 text-neutral-700 font-semibold text-sm hover:bg-nude-50">
+                        <i class="fa-solid fa-arrow-left mr-2"></i> Voltar
+                    </button>
+                    <button onclick="finalizarAgendamento()" class="px-8 py-3 bg-emerald-700 text-white font-semibold rounded-xl text-sm hover:bg-emerald-800 transition-all shadow-md flex items-center gap-2">
+                        <i class="fa-brands fa-whatsapp text-lg"></i> Confirmar & Enviar no WhatsApp
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Seção Galeria & Espaço -->
+        <section class="bg-white py-16 px-4 border-t border-nude-200 mt-12">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-10">
+                    <span class="text-xs font-bold uppercase tracking-widest text-rosegold-dark">Nosso Espaço & Trabalhos</span>
+                    <h3 class="font-serif text-3xl font-bold mt-1">Galeria de Inspirações</h3>
+                </div>
+                <div id="galeria-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <!-- Preenchido via JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- PAINEL ADMINISTRATIVO / ACESSO AO STUDIO -->
+    <div id="view-admin" class="hidden flex-grow max-w-6xl mx-auto px-4 py-8 w-full">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 bg-white p-6 rounded-2xl shadow-sm border border-nude-200">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-rosegold-dark">Painel de Controle Exclusivo</span>
+                <h2 class="font-serif text-2xl font-bold">Gerenciamento do Studio</h2>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="mudarVisao('site')" class="px-5 py-2.5 rounded-xl border border-nude-300 text-sm font-semibold hover:bg-nude-50">
+                    <i class="fa-solid fa-globe mr-2"></i> Ver Site Público
+                </button>
+                <button onclick="logoutAdmin()" class="px-5 py-2.5 rounded-xl bg-red-50 text-red-700 text-sm font-semibold hover:bg-red-100">
+                    <i class="fa-solid fa-right-from-bracket mr-2"></i> Sair
+                </button>
+            </div>
+        </div>
+
+        <!-- Abas do Admin -->
+        <div class="flex flex-wrap gap-2 mb-6 border-b border-nude-200 pb-4">
+            <button onclick="alternarAbaAdmin('agenda')" id="tab-btn-agenda" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-nude-900 text-white transition-all shadow-sm">
+                <i class="fa-solid fa-calendar-check mr-2"></i> Agenda & Clientes
+            </button>
+            <button onclick="alternarAbaAdmin('servicos')" id="tab-btn-servicos" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white text-nude-800 border border-nude-200 hover:bg-nude-50 transition-all">
+                <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Serviços & Preços
+            </button>
+            <button onclick="alternarAbaAdmin('config')" id="tab-btn-config" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white text-nude-800 border border-nude-200 hover:bg-nude-50 transition-all">
+                <i class="fa-solid fa-gear mr-2"></i> Informações do Studio
+            </button>
+            <button onclick="alternarAbaAdmin('galeria')" id="tab-btn-galeria" class="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white text-nude-800 border border-nude-200 hover:bg-nude-50 transition-all">
+                <i class="fa-solid fa-images mr-2"></i> Galeria de Fotos (.JPG)
+            </button>
+        </div>
+
+        <!-- CONTEÚDO DA ABA: AGENDA -->
+        <div id="admin-tab-agenda" class="space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-nude-200">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-serif text-xl font-bold">Agendamentos Recebidos</h3>
+                    <div class="text-xs font-semibold bg-nude-100 px-3 py-1.5 rounded-lg text-nude-900">
+                        Total Agendados: <span id="admin-count-agendamentos">0</span>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-nude-200 text-xs uppercase tracking-wider text-neutral-500">
+                                <th class="py-3 px-4">Cliente</th>
+                                <th class="py-3 px-4">Data & Horário</th>
+                                <th class="py-3 px-4">Procedimentos</th>
+                                <th class="py-3 px-4">Total</th>
+                                <th class="py-3 px-4">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-tabela-agendamentos" class="text-sm">
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTEÚDO DA ABA: SERVIÇOS -->
+        <div id="admin-tab-servicos" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-nude-200 flex justify-between items-center">
+                <div>
+                    <h3 class="font-serif text-xl font-bold">Gerenciar Procedimentos</h3>
+                    <p class="text-xs text-neutral-500 mt-0.5">Adicione, altere valores ou gerencie as fotos dos serviços.</p>
+                </div>
+                <button onclick="abrirModalServico()" class="px-4 py-2.5 bg-nude-900 text-white rounded-xl text-xs font-semibold hover:bg-rosegold-dark">
+                    <i class="fa-solid fa-plus mr-1"></i> Novo Procedimento
+                </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="admin-lista-servicos">
+                <!-- Preenchido via JS -->
+            </div>
+        </div>
+
+        <!-- CONTEÚDO DA ABA: CONFIGURAÇÕES -->
+        <div id="admin-tab-config" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-nude-200 max-w-3xl mx-auto">
+                <h3 class="font-serif text-2xl font-bold mb-2">Informações Gerais do Studio</h3>
+                <p class="text-xs text-neutral-500 mb-6">Altere os dados do Studio, a senha de acesso e envie a nova foto de perfil para o Supabase Storage.</p>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Nome do Studio</label>
+                        <input type="text" id="cfg-nome" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Subtítulo / Especialidade</label>
+                        <input type="text" id="cfg-sub" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Foto de Perfil (.JPG / .PNG)</label>
+                        <input type="file" id="cfg-foto-file" accept="image/jpeg, image/png" class="w-full p-2.5 rounded-xl border border-nude-200 bg-nude-50 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rosegold file:text-white hover:file:bg-rosegold-dark cursor-pointer">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Endereço Completo</label>
+                        <input type="text" id="cfg-endereco" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">WhatsApp para Agendamentos</label>
+                        <input type="text" id="cfg-whatsapp" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm" placeholder="5571999999999">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Texto de Apresentação / Bio</label>
+                        <textarea id="cfg-bio" rows="3" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm"></textarea>
+                    </div>
+                    <!-- CAMPO ACRESCENTADO: ALTERAR SENHA DO ADMIN -->
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Nova Senha do Administrador</label>
+                        <input type="password" id="cfg-senha" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm" placeholder="Deixe em branco para manter a atual">
+                    </div>
+
+                    <button onclick="salvarConfiguracoesGerais()" class="w-full py-3 bg-nude-900 text-white rounded-xl font-semibold text-sm hover:bg-rosegold-dark transition-all shadow-md mt-4">
+                        Salvar Informações
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTEÚDO DA ABA: GALERIA -->
+        <div id="admin-tab-galeria" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 shadow-sm border border-nude-200 flex justify-between items-center">
+                <div>
+                    <h3 class="font-serif text-xl font-bold">Gerenciar Galeria de Fotos</h3>
+                    <p class="text-xs text-neutral-500 mt-0.5">Envie fotos diretamente do seu dispositivo para o bucket do Supabase.</p>
+                </div>
+                <button onclick="abrirModalGaleria()" class="px-4 py-2.5 bg-nude-900 text-white rounded-xl text-xs font-semibold hover:bg-rosegold-dark">
+                    <i class="fa-solid fa-plus mr-1"></i> Enviar Nova Foto
+                </button>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="admin-lista-galeria">
+                <!-- Preenchido via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE LOGIN ADMIN -->
+    <div id="modal-login" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-nude-200">
+            <div class="text-center mb-6">
+                <div class="w-12 h-12 rounded-full bg-nude-100 text-rosegold flex items-center justify-center mx-auto mb-3 text-lg">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="font-serif text-2xl font-bold">Acesso ao Studio</h3>
+                <p class="text-xs text-neutral-500 mt-1">Digite a senha administrativa para continuar.</p>
+            </div>
+            <div class="space-y-4">
+                <input type="password" id="input-senha" placeholder="Senha (padrão: 1234)" class="w-full p-3.5 rounded-xl border border-nude-200 bg-nude-50 text-center text-lg font-mono tracking-widest focus:outline-none focus:border-rosegold">
+                <div id="login-erro" class="text-xs text-red-600 text-center font-medium hidden">Senha incorreta. Tente novamente.</div>
+                <div class="flex gap-3 pt-2">
+                    <button onclick="fecharAdminLogin()" class="w-1/2 py-3 rounded-xl border border-nude-300 text-sm font-semibold text-neutral-700 hover:bg-nude-50">Cancelar</button>
+                    <button onclick="validarLogin()" class="w-1/2 py-3 rounded-xl bg-nude-900 text-white text-sm font-semibold hover:bg-rosegold-dark">Entrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE CADASTRO/EDIÇÃO DE SERVIÇO -->
+    <div id="modal-servico" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-nude-200">
+            <h3 id="modal-servico-titulo" class="font-serif text-2xl font-bold mb-4">Novo Procedimento</h3>
+            <input type="hidden" id="servico-edit-id">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Nome do Procedimento</label>
+                    <input type="text" id="srv-nome" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Preço (R$)</label>
+                        <input type="number" id="srv-preco" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm" placeholder="90.00">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Duração (minutos)</label>
+                        <input type="number" id="srv-duracao" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm" placeholder="45">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Categoria</label>
+                    <input type="text" id="srv-categoria" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm" placeholder="Ex: Sobrancelhas, Cílios...">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Descrição Curta</label>
+                    <textarea id="srv-desc" rows="2" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Foto do Procedimento</label>
+                    <input type="file" id="srv-foto-file" accept="image/jpeg, image/png" class="w-full p-2.5 rounded-xl border border-nude-200 bg-nude-50 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rosegold file:text-white hover:file:bg-rosegold-dark cursor-pointer">
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button onclick="fecharModalServico()" class="w-1/2 py-3 rounded-xl border border-nude-300 text-sm font-semibold">Cancelar</button>
+                    <button onclick="salvarServico()" class="w-1/2 py-3 rounded-xl bg-nude-900 text-white text-sm font-semibold hover:bg-rosegold-dark">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE ADICIONAR FOTO NA GALERIA -->
+    <div id="modal-galeria" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-nude-200">
+            <h3 class="font-serif text-2xl font-bold mb-4">Enviar Foto para Galeria</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Selecionar Arquivo de Imagem</label>
+                    <input type="file" id="galeria-file-input" accept="image/jpeg, image/png" class="w-full p-2.5 rounded-xl border border-nude-200 bg-nude-50 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-rosegold file:text-white hover:file:bg-rosegold-dark cursor-pointer">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Legenda da Foto</label>
+                    <input type="text" id="galeria-legenda-input" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm" placeholder="Ex: Volume Brasileiro">
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button onclick="fecharModalGaleria()" class="w-1/2 py-3 rounded-xl border border-nude-300 text-sm font-semibold">Cancelar</button>
+                    <button onclick="salvarFotoGaleria()" class="w-1/2 py-3 rounded-xl bg-nude-900 text-white text-sm font-semibold hover:bg-rosegold-dark">Enviar e Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RODAPÉ -->
+    <footer class="bg-nude-900 text-nude-100 py-10 px-4 mt-auto border-t border-nude-800">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+            <div>
+                <p id="footer-studio-name" class="font-serif text-xl font-bold tracking-wide">Studio Bia Cardeal Beauty</p>
+                <p id="footer-studio-sub" class="text-xs text-nude-300 mt-1">Excelência e cuidado em cada detalhe.</p>
+            </div>
+            <div class="text-xs text-nude-300">
+                <p>© 2026 Studio Bia Cardeal Beauty em parceria com</p>
+                <a href="https://www.instagram.com/ravhtech" target="_blank" rel="noopener noreferrer" class="text-rosegold-light hover:underline font-semibold">Ravh Tech</a>. Todos os direitos reservados.
+            </div>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT INTEGRADO AO BACKEND FASTAPI (PYTHON) -->
+    <script>
+        const API_URL = 'http://127.0.0.1:8000/api';
+
+        let appData = { config: {}, servicos: [], galeria: [], agendamentos: [] };
+        let carrinhoServicos = [];
+        let dataEscolhida = '';
+        let horarioEscolhido = '';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarDadosDaAPI();
+            document.getElementById('input-data').min = new Date().toISOString().split('T')[0];
+        });
+
+        // 1. BUSCAR DADOS DO BACKEND PYTHON
+        async function carregarDadosDaAPI() {
+            try {
+                const resConfig = await fetch(`${API_URL}/config`);
+                appData.config = await resConfig.json();
+
+                if (appData.config.foto_perfil) {
+                    document.getElementById('nav-logo-img').src = appData.config.foto_perfil;
+                    document.getElementById('hero-profile-img').src = appData.config.foto_perfil;
+                    localStorage.setItem('studio_logo_url', appData.config.foto_perfil);
+                }
+                if (appData.config.nome) {
+                    document.getElementById('nav-studio-name').innerText = appData.config.nome;
+                    document.getElementById('hero-title').innerText = appData.config.nome;
+                    document.getElementById('footer-studio-name').innerText = appData.config.nome;
+                }
+                if (appData.config.sub) {
+                    document.getElementById('nav-studio-sub').innerText = appData.config.sub;
+                    document.getElementById('hero-tag').innerText = appData.config.sub;
+                    document.getElementById('footer-studio-sub').innerText = appData.config.sub;
+                }
+                if (appData.config.endereco) {
+                    document.getElementById('info-endereco').innerText = appData.config.endereco;
+                }
+                if (appData.config.bio) {
+                    document.getElementById('hero-desc').innerText = appData.config.bio;
+                }
+
+                // Preenche os campos do formulário de configuração no admin com os valores atuais
+                if (document.getElementById('cfg-nome')) document.getElementById('cfg-nome').value = appData.config.nome || '';
+                if (document.getElementById('cfg-sub')) document.getElementById('cfg-sub').value = appData.config.sub || '';
+                if (document.getElementById('cfg-endereco')) document.getElementById('cfg-endereco').value = appData.config.endereco || '';
+                if (document.getElementById('cfg-whatsapp')) document.getElementById('cfg-whatsapp').value = appData.config.whatsapp || '';
+                if (document.getElementById('cfg-bio')) document.getElementById('cfg-bio').value = appData.config.bio || '';
+
+                const resServicos = await fetch(`${API_URL}/servicos`);
+                appData.servicos = await resServicos.json();
+
+                const resGaleria = await fetch(`${API_URL}/galeria`);
+                appData.galeria = await resGaleria.json();
+
+                const resAgendamentos = await fetch(`${API_URL}/agendamentos`);
+                appData.agendamentos = await resAgendamentos.json();
+
+                renderizarSite();
+            } catch (err) {
+                console.error("Erro ao conectar com o backend Python:", err);
+            }
+        }
+
+        // 2. UPLOAD DE IMAGEM SEGURO VIA BACKEND PYTHON
+        async function enviarImagemParaBackend(file) {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const response = await fetch(`${API_URL}/upload`, {
+                method: "POST",
+                body: formData
+            });
+
+            if (!response.ok) {
+                alert("Erro ao enviar imagem para o servidor.");
+                return null;
+            }
+            const data = await response.json();
+            return data.url;
+        }
+
+        // 3. RENDERIZAR INTERFACE DO SITE
+        function renderizarSite() {
+            // Renderizar Serviços Públicos
+            const containerServicos = document.getElementById('servicos-lista-publica');
+            containerServicos.innerHTML = '';
+
+            appData.servicos.forEach(srv => {
+                const selecionado = carrinhoServicos.some(s => s.id === srv.id);
+                containerServicos.innerHTML += `
+                    <div onclick="alternarServico(${srv.id})" class="cursor-pointer bg-white rounded-2xl p-5 border ${selecionado ? 'border-rosegold ring-2 ring-rosegold/20 bg-nude-50/50' : 'border-nude-200'} shadow-sm hover:border-rosegold transition-all flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-16 h-16 rounded-xl overflow-hidden bg-nude-100 flex-shrink-0">
+                                <img src="${srv.foto || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=300&q=80'}" alt="${srv.nome}" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-rosegold-dark">${srv.categoria}</span>
+                                <h4 class="font-serif font-bold text-lg text-nude-900">${srv.nome}</h4>
+                                <p class="text-xs text-neutral-500 mt-0.5 line-clamp-1">${srv.desc || ''}</p>
+                                <p class="text-xs font-semibold text-neutral-700 mt-1"><i class="fa-regular fa-clock mr-1 text-rosegold"></i> ${srv.duracao} min</p>
+                            </div>
+                        </div>
+                        <div class="text-right flex flex-col items-end gap-2">
+                            <span class="font-serif font-bold text-lg text-nude-900">R$ ${Number(srv.preco).toFixed(2).replace('.', ',')}</span>
+                            <div class="w-7 h-7 rounded-full ${selecionado ? 'bg-rosegold text-white' : 'border border-nude-300 text-transparent'} flex items-center justify-center text-xs transition-all">
+                                <i class="fa-solid fa-check"></i>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Renderizar Galeria Pública
+            const containerGaleria = document.getElementById('galeria-grid');
+            containerGaleria.innerHTML = '';
+            appData.galeria.forEach(foto => {
+                containerGaleria.innerHTML += `
+                    <div class="aspect-square rounded-2xl overflow-hidden shadow-sm border border-nude-200 group relative">
+                        <img src="${foto.url}" alt="${foto.legenda || 'Trabalho Studio'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        ${foto.legenda ? `<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">${foto.legenda}</div>` : ''}
+                    </div>
+                `;
+            });
+
+            // Admin: Tabela de Agendamentos
+            const tabelaAgendamentos = document.getElementById('admin-tabela-agendamentos');
+            tabelaAgendamentos.innerHTML = '';
+            document.getElementById('admin-count-agendamentos').innerText = appData.agendamentos.length;
+
+            if (appData.agendamentos.length === 0) {
+                tabelaAgendamentos.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-neutral-400 text-xs">Nenhum agendamento registado ainda.</td></tr>`;
+            } else {
+                appData.agendamentos.forEach(ag => {
+                    tabelaAgendamentos.innerHTML += `
+                        <tr class="border-b border-nude-100 hover:bg-nude-50">
+                            <td class="py-3 px-4">
+                                <p class="font-bold text-nude-900">${ag.cliente}</p>
+                                <p class="text-xs text-neutral-500"><i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i> ${ag.whatsapp}</p>
+                                ${ag.obs ? `<p class="text-[11px] text-neutral-400 italic">Obs: ${ag.obs}</p>` : ''}
+                            </td>
+                            <td class="py-3 px-4 text-xs font-semibold text-neutral-700">${ag.data} às ${ag.horario}</td>
+                            <td class="py-3 px-4 text-xs text-neutral-600">${Array.isArray(ag.servicos) ? ag.servicos.join(', ') : ag.servicos}</td>
+                            <td class="py-3 px-4 font-bold text-nude-900">R$ ${Number(ag.total).toFixed(2).replace('.', ',')}</td>
+                            <td class="py-3 px-4">
+                                <button onclick="deletarAgendamento(${ag.id})" class="p-2 text-red-600 hover:bg-red-50 rounded-lg text-xs" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Admin: Lista de Serviços
+            const adminListaServicos = document.getElementById('admin-lista-servicos');
+            adminListaServicos.innerHTML = '';
+            appData.servicos.forEach(srv => {
+                adminListaServicos.innerHTML += `
+                    <div class="bg-white rounded-2xl p-4 border border-nude-200 flex items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${srv.foto || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=300&q=80'}" class="w-12 h-12 rounded-xl object-cover">
+                            <div>
+                                <h4 class="font-bold text-sm text-nude-900">${srv.nome}</h4>
+                                <p class="text-xs text-neutral-500">R$ ${Number(srv.preco).toFixed(2)} • ${srv.duracao} min</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="editarServico(${srv.id})" class="p-2 text-nude-800 hover:bg-nude-100 rounded-xl text-xs"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deletarServico(${srv.id})" class="p-2 text-red-600 hover:bg-red-50 rounded-xl text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Admin: Lista de Galeria
+            const adminListaGaleria = document.getElementById('admin-lista-galeria');
+            adminListaGaleria.innerHTML = '';
+            appData.galeria.forEach(foto => {
+                adminListaGaleria.innerHTML += `
+                    <div class="aspect-square rounded-2xl overflow-hidden border border-nude-200 relative group">
+                        <img src="${foto.url}" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                            <button onclick="deletarGaleria(${foto.id})" class="p-2.5 bg-red-600 text-white rounded-xl text-xs hover:bg-red-700"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // 4. FLUXO DE AGENDAMENTO E CARRINHO
+        function alternarServico(id) {
+            const servico = appData.servicos.find(s => s.id === id);
+            const index = carrinhoServicos.findIndex(s => s.id === id);
+
+            if (index > -1) {
+                carrinhoServicos.splice(index, 1);
+            } else {
+                carrinhoServicos.push(servico);
+            }
+
+            atualizarResumoCarrinho();
+            renderizarSite();
+        }
+
+        function atualizarResumoCarrinho() {
+            const count = carrinhoServicos.length;
+            const totalPreco = carrinhoServicos.reduce((acc, s) => acc + s.preco, 0);
+            const totalDuracao = carrinhoServicos.reduce((acc, s) => acc + s.duracao, 0);
+
+            document.getElementById('count-selected').innerText = count;
+            document.getElementById('total-price').innerText = totalPreco.toFixed(2).replace('.', ',');
+            document.getElementById('total-duration').innerText = totalDuracao;
+
+            const btnAvancar = document.getElementById('btn-avancar-1');
+            if (count > 0) {
+                btnAvancar.removeAttribute('disabled');
+            } else {
+                btnAvancar.setAttribute('disabled', 'true');
+            }
+        }
+
+        function irParaPasso2() {
+            document.getElementById('step-1-container').classList.add('hidden');
+            document.getElementById('step-2-container').classList.remove('hidden');
+            document.getElementById('step-dot-1').className = "w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center font-bold text-sm justify-center";
+            document.getElementById('step-dot-2').className = "w-8 h-8 rounded-full bg-nude-900 text-white flex items-center font-bold text-sm justify-center";
+        }
+
+        function voltarPasso(passo) {
+            if (passo === 1) {
+                document.getElementById('step-2-container').classList.add('hidden');
+                document.getElementById('step-1-container').classList.remove('hidden');
+                document.getElementById('step-dot-1').className = "w-8 h-8 rounded-full bg-nude-900 text-white flex items-center font-bold text-sm justify-center";
+                document.getElementById('step-dot-2').className = "w-8 h-8 rounded-full bg-nude-200 text-nude-800 flex items-center font-bold text-sm justify-center";
+            } else if (passo === 2) {
+                document.getElementById('step-3-container').classList.add('hidden');
+                document.getElementById('step-2-container').classList.remove('hidden');
+                document.getElementById('step-dot-2').className = "w-8 h-8 rounded-full bg-nude-900 text-white flex items-center font-bold text-sm justify-center";
+                document.getElementById('step-dot-3').className = "w-8 h-8 rounded-full bg-nude-200 text-nude-800 flex items-center font-bold text-sm justify-center";
+            }
+        }
+
+        function gerarHorariosDisponiveis() {
+            const inputData = document.getElementById('input-data').value;
+            dataEscolhida = inputData;
+            const grid = document.getElementById('horarios-grid');
+            grid.innerHTML = '';
+
+            if (!inputData) {
+                grid.innerHTML = `<p class="text-xs text-neutral-400 col-span-3 py-4 text-center">Selecione uma data acima para ver os horários.</p>`;
+                return;
+            }
+
+            const horariosFixos = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+            horariosFixos.forEach(h => {
+                grid.innerHTML += `
+                    <button onclick="selecionarHorario('${h}', this)" class="p-2.5 rounded-xl border border-nude-200 text-xs font-semibold text-neutral-800 hover:border-rosegold hover:bg-nude-50 transition-all">${h}</button>
+                `;
+            });
+        }
+
+        function selecionarHorario(horario, btn) {
+            document.querySelectorAll('#horarios-grid button').forEach(b => {
+                b.className = "p-2.5 rounded-xl border border-nude-200 text-xs font-semibold text-neutral-800 hover:border-rosegold hover:bg-nude-50 transition-all";
+            });
+            btn.className = "p-2.5 rounded-xl bg-nude-900 text-white text-xs font-semibold shadow-sm";
+            horarioEscolhido = horario;
+
+            document.getElementById('btn-avancar-2').removeAttribute('disabled');
+        }
+
+        function irParaPasso3() {
+            document.getElementById('step-2-container').classList.add('hidden');
+            document.getElementById('step-3-container').classList.remove('hidden');
+            document.getElementById('step-dot-2').className = "w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center font-bold text-sm justify-center";
+            document.getElementById('step-dot-3').className = "w-8 h-8 rounded-full bg-nude-900 text-white flex items-center font-bold text-sm justify-center";
+        }
+
+        async function finalizarAgendamento() {
+            const nome = document.getElementById('cliente-nome').value.trim();
+            const whatsapp = document.getElementById('cliente-whatsapp').value.trim();
+            const obs = document.getElementById('cliente-obs').value.trim();
+
+            if (!nome || !whatsapp) {
+                alert("Por favor, preencha seu nome e WhatsApp.");
+                return;
+            }
+
+            const totalPreco = carrinhoServicos.reduce((acc, s) => acc + s.preco, 0);
+            const nomesServicos = carrinhoServicos.map(s => s.nome);
+
+            const payload = {
+                cliente: nome,
+                whatsapp: whatsapp,
+                obs: obs,
+                data: dataEscolhida,
+                horario: horarioEscolhido,
+                servicos: nomesServicos,
+                total: totalPreco
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/agendamentos`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (res.ok) {
+                    const studioWp = appData.config.whatsapp || "5571999999999";
+                    const textoWp = encodeURIComponent(`Olá! Gostaria de confirmar meu agendamento no ${appData.config.nome || 'Studio'}.\n\n*Cliente:* ${nome}\n*Data:* ${dataEscolhida} às ${horarioEscolhido}\n*Serviços:* ${nomesServicos.join(', ')}\n*Total:* R$ ${totalPreco.toFixed(2)}`);
+                    window.open(`https://wa.me/${studioWp}?text=${textoWp}`, '_blank');
+                    window.location.reload();
+                } else {
+                    alert("Erro ao registrar agendamento.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Erro de conexão com o servidor.");
+            }
+        }
+
+        // 5. NAVEGAÇÃO DE TELAS E ADMIN (COM VALIDAÇÃO DE SENHA PERSONALIZADA)
+        function mudarVisao(visao) {
+            if (visao === 'site') {
+                document.getElementById('view-admin').classList.add('hidden');
+                document.getElementById('view-site').classList.remove('hidden');
+            } else if (visao === 'admin') {
+                document.getElementById('view-site').classList.add('hidden');
+                document.getElementById('view-admin').classList.remove('hidden');
+                alternarAbaAdmin('agenda');
+            }
+        }
+
+        function abrirAdminLogin() {
+            document.getElementById('modal-login').classList.remove('hidden');
+        }
+
+        function fecharAdminLogin() {
+            document.getElementById('modal-login').classList.add('hidden');
+            document.getElementById('input-senha').value = '';
+            document.getElementById('login-erro').classList.add('hidden');
+        }
+
+        function validarLogin() {
+            const senhaDigitada = document.getElementById('input-senha').value;
+            
+            // Verifica a senha personalizada salva no Supabase (appData.config.admin_senha), ou no localStorage, ou o padrão '1234'
+            const senhaOficial = (appData.config && appData.config.admin_senha) || localStorage.getItem('admin_custom_password') || '1234';
+
+            if (senhaDigitada === senhaOficial) {
+                fecharAdminLogin();
+                mudarVisao('admin');
+            } else {
+                document.getElementById('login-erro').classList.remove('hidden');
+            }
+        }
+
+        function logoutAdmin() {
+            mudarVisao('site');
+        }
+
+        function alternarAbaAdmin(aba) {
+            ['agenda', 'servicos', 'config', 'galeria'].forEach(a => {
+                document.getElementById(`admin-tab-${a}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${a}`).className = "px-5 py-2.5 rounded-xl text-sm font-semibold bg-white text-nude-800 border border-nude-200 hover:bg-nude-50 transition-all";
+            });
+            document.getElementById(`admin-tab-${aba}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${aba}`).className = "px-5 py-2.5 rounded-xl text-sm font-semibold bg-nude-900 text-white transition-all shadow-sm";
+        }
+
+        // 6. FUNÇÕES DO PAINEL ADMIN (Config, Serviços, Galeria)
+        async function salvarConfiguracoesGerais() {
+            const nome = document.getElementById('cfg-nome').value;
+            const sub = document.getElementById('cfg-sub').value;
+            const endereco = document.getElementById('cfg-endereco').value;
+            const whatsapp = document.getElementById('cfg-whatsapp').value;
+            const bio = document.getElementById('cfg-bio').value;
+            const novaSenha = document.getElementById('cfg-senha').value;
+            const fileInput = document.getElementById('cfg-foto-file');
+
+            let fotoUrl = appData.config.foto_perfil;
+            if (fileInput.files.length > 0) {
+                const uploaded = await enviarImagemParaBackend(fileInput.files[0]);
+                if (uploaded) fotoUrl = uploaded;
+            }
+
+            const payload = { nome, sub, endereco, whatsapp, bio, foto_perfil: fotoUrl };
+            
+            // Se o usuário digitou uma nova senha, inclui no payload para salvar no Supabase
+            if (novaSenha && novaSenha.trim() !== "") {
+                payload.admin_senha = novaSenha.trim();
+                localStorage.setItem('admin_custom_password', novaSenha.trim());
+            }
+
+            const res = await fetch(`${API_URL}/config`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                localStorage.setItem('studio_logo_url', fotoUrl);
+                alert("Configurações atualizadas com sucesso!");
+                document.getElementById('cfg-senha').value = ''; // Limpa o campo de senha por segurança
+                carregarDadosDaAPI();
+            } else {
+                alert("Erro ao atualizar configurações.");
+            }
+        }
+
+        function abrirModalServico() {
+            document.getElementById('modal-servico-titulo').innerText = "Novo Procedimento";
+            document.getElementById('servico-edit-id').value = '';
+            document.getElementById('srv-nome').value = '';
+            document.getElementById('srv-preco').value = '';
+            document.getElementById('srv-duracao').value = '';
+            document.getElementById('srv-categoria').value = '';
+            document.getElementById('srv-desc').value = '';
+            document.getElementById('srv-foto-file').value = '';
+            document.getElementById('modal-servico').classList.remove('hidden');
+        }
+
+        function fecharModalServico() {
+            document.getElementById('modal-servico').classList.add('hidden');
+        }
+
+        async function salvarServico() {
+            const id = document.getElementById('servico-edit-id').value;
+            const nome = document.getElementById('srv-nome').value;
+            const preco = parseFloat(document.getElementById('srv-preco').value);
+            const duracao = parseInt(document.getElementById('srv-duracao').value);
+            const categoria = document.getElementById('srv-categoria').value;
+            const desc = document.getElementById('srv-desc').value;
+            const fileInput = document.getElementById('srv-foto-file');
+
+            let fotoUrl = '';
+            if (id) {
+                const srvAntigo = appData.servicos.find(s => s.id == id);
+                fotoUrl = srvAntigo ? srvAntigo.foto : '';
+            }
+
+            if (fileInput.files.length > 0) {
+                const uploaded = await enviarImagemParaBackend(fileInput.files[0]);
+                if (uploaded) fotoUrl = uploaded;
+            }
+
+            const payload = { nome, preco, duracao, categoria, desc, foto: fotoUrl };
+
+            const res = await fetch(`${API_URL}/servicos`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                fecharModalServico();
+                carregarDadosDaAPI();
+            } else {
+                alert("Erro ao salvar procedimento.");
+            }
+        }
+
+        function editarServico(id) {
+            const s = appData.servicos.find(item => item.id === id);
+            if (!s) return;
+            document.getElementById('modal-servico-titulo').innerText = "Editar Procedimento";
+            document.getElementById('servico-edit-id').value = s.id;
+            document.getElementById('srv-nome').value = s.nome;
+            document.getElementById('srv-preco').value = s.preco;
+            document.getElementById('srv-duracao').value = s.duracao;
+            document.getElementById('srv-categoria').value = s.categoria;
+            document.getElementById('srv-desc').value = s.desc || '';
+            document.getElementById('modal-servico').classList.remove('hidden');
+        }
+
+        async function deletarServico(id) {
+            if (!confirm("Deseja eliminar este procedimento?")) return;
+            await fetch(`${API_URL}/servicos/${id}`, { method: 'DELETE' });
+            carregarDadosDaAPI();
+        }
+
+        function abrirModalGaleria() {
+            document.getElementById('galeria-file-input').value = '';
+            document.getElementById('galeria-legenda-input').value = '';
+            document.getElementById('modal-galeria').classList.remove('hidden');
+        }
+
+        function fecharModalGaleria() {
+            document.getElementById('modal-galeria').classList.add('hidden');
+        }
+
+        async function salvarFotoGaleria() {
+            const fileInput = document.getElementById('galeria-file-input');
+            const legenda = document.getElementById('galeria-legenda-input').value;
+
+            if (fileInput.files.length === 0) {
+                alert("Selecione uma imagem.");
+                return;
+            }
+
+            const url = await enviarImagemParaBackend(fileInput.files[0]);
+            if (!url) return;
+
+            const res = await fetch(`${API_URL}/galeria`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url, legenda })
+            });
+
+            if (res.ok) {
+                fecharModalGaleria();
+                carregarDadosDaAPI();
+            } else {
+                alert("Erro ao salvar foto na galeria.");
+            }
+        }
+
+        async function deletarGaleria(id) {
+            if (!confirm("Deseja eliminar esta foto da galeria?")) return;
+            await fetch(`${API_URL}/galeria/${id}`, { method: 'DELETE' });
+            carregarDadosDaAPI();
+        }
+
+        async function deletarAgendamento(id) {
+            if (!confirm("Deseja eliminar este agendamento?")) return;
+            await fetch(`${API_URL}/agendamentos/${id}`, { method: 'DELETE' });
+            carregarDadosDaAPI();
+        }
+    </script>
+</body>
+</html>
