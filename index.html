@@ -796,7 +796,7 @@
             window.location.href = `https://api.whatsapp.com/send?phone=${studioWp}&text=${textoWp}`;
         }
 
-        // 5. NAVEGAÇÃO DE TELAS E ADMIN (SUPORTA 1234 E SENHAS PERSONALIZADAS)
+        // 5. NAVEGAÇÃO DE TELAS E ADMIN (VALIDAÇÃO ESTRITA NO BACKEND)
         function mudarVisao(visao) {
             if (visao === 'site') {
                 document.getElementById('view-admin').classList.add('hidden');
@@ -821,7 +821,12 @@
         async function validarLogin() {
             const senhaDigitada = document.getElementById('input-senha').value.trim();
             
-            // Valida sempre no backend para aceitar tanto a senha padrão '1234' quanto a sua senha personalizada salva no banco
+            if (!senhaDigitada) {
+                document.getElementById('login-erro').classList.remove('hidden');
+                return;
+            }
+
+            // Valida estritamente no backend (Supabase) sem desvios locais ou senhas fixas
             try {
                 const res = await fetch(`${API_URL}/admin/verify`, {
                     method: 'POST',
@@ -831,7 +836,7 @@
 
                 const data = await res.json();
 
-                if (data.verified || senhaDigitada === '1234') {
+                if (data.verified) {
                     fecharAdminLogin();
                     mudarVisao('admin');
                 } else {
@@ -839,13 +844,7 @@
                 }
             } catch (err) {
                 console.error("Erro ao validar login:", err);
-                // Fallback de segurança se o backend estiver instável e for a senha padrão
-                if (senhaDigitada === '1234') {
-                    fecharAdminLogin();
-                    mudarVisao('admin');
-                } else {
-                    document.getElementById('login-erro').classList.remove('hidden');
-                }
+                document.getElementById('login-erro').classList.remove('hidden');
             }
         }
 
