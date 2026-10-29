@@ -765,7 +765,7 @@
                 total: totalPreco
             };
 
-            // Tenta salvar no Supabase via backend, mas abre o WhatsApp de forma garantida
+            // Tenta salvar no Supabase via backend (não bloqueia o WhatsApp se falhar)
             try {
                 await fetch(`${API_URL}/agendamentos`, {
                     method: 'POST',
@@ -773,10 +773,9 @@
                     body: JSON.stringify(payload)
                 });
             } catch (err) {
-                console.error("Aviso ao salvar no banco (o WhatsApp abrirá normalmente):", err);
+                console.error("Aviso ao salvar no banco:", err);
             }
 
-            // Número do Studio limpo (remove caracteres especiais) e fallback seguro se vazio
             let studioWp = (appData.config && appData.config.whatsapp) ? String(appData.config.whatsapp).replace(/\D/g, '') : "5571999999999";
             if (studioWp.length === 10 || studioWp.length === 11) {
                 studioWp = '55' + studioWp;
@@ -793,16 +792,15 @@
                 (obs ? `\n*Obs:* ${obs}` : '')
             );
 
-            // Abre o link direto do WhatsApp (Funciona em computadores e telemóveis)
+            // Abre o WhatsApp com a mensagem pronta
             window.open(`https://api.whatsapp.com/send?phone=${studioWp}&text=${textoWp}`, '_blank');
             
-            // Recarrega a página para limpar o carrinho
             setTimeout(() => {
                 window.location.reload();
             }, 800);
         }
 
-        // 5. NAVEGAÇÃO DE TELAS E ADMIN
+        // 5. NAVEGAÇÃO DE TELAS E ADMIN (COM FORÇAGEM DA SENHA 1234)
         function mudarVisao(visao) {
             if (visao === 'site') {
                 document.getElementById('view-admin').classList.add('hidden');
@@ -825,8 +823,15 @@
         }
 
         async function validarLogin() {
-            const senhaDigitada = document.getElementById('input-senha').value;
+            const senhaDigitada = document.getElementById('input-senha').value.trim();
             
+            // FORÇA IMEDIATA: Se for '1234', entra direto sem depender de banco de dados ou backend
+            if (senhaDigitada === '1234') {
+                fecharAdminLogin();
+                mudarVisao('admin');
+                return;
+            }
+
             try {
                 const res = await fetch(`${API_URL}/admin/verify`, {
                     method: 'POST',
@@ -844,7 +849,7 @@
                 }
             } catch (err) {
                 console.error("Erro ao validar login:", err);
-                alert("Erro ao conectar com o servidor para validar a senha.");
+                document.getElementById('login-erro').classList.remove('hidden');
             }
         }
 
@@ -855,7 +860,7 @@
         function alternarAbaAdmin(aba) {
             ['agenda', 'servicos', 'config', 'galeria'].forEach(a => {
                 document.getElementById(`admin-tab-${a}`).classList.add('hidden');
-                document.getElementById(`tab-btn-${a}`).className = "px-5 py-2.5 rounded-xl text-sm font-semibold bg-white text-nude-800 border border-nude-200 hover:bg-nude-50 transition-all";
+                document.getElementById(`tab-btn-${aba}`).className = "px-5 py-2.5 rounded-xl text-sm font-semibold bg-white text-nude-800 border border-nude-200 hover:bg-nude-50 transition-all";
             });
             document.getElementById(`admin-tab-${aba}`).classList.remove('hidden');
             document.getElementById(`tab-btn-${aba}`).className = "px-5 py-2.5 rounded-xl text-sm font-semibold bg-nude-900 text-white transition-all shadow-sm";
