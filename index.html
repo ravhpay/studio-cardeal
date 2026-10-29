@@ -455,7 +455,7 @@
         </div>
     </footer>
 
- <!-- JAVASCRIPT INTEGRADO AO BACKEND FASTAPI (PYTHON) -->
+<!-- JAVASCRIPT INTEGRADO AO BACKEND FASTAPI (PYTHON) -->
     <script>
         const API_URL = 'https://studio-cardeal-1.onrender.com/api';
          
@@ -741,7 +741,7 @@
             document.getElementById('step-dot-3').className = "w-8 h-8 rounded-full bg-nude-900 text-white flex items-center font-bold text-sm justify-center";
         }
 
-        // --- CORREÇÃO DO WHATSAPP APLICADA ABAIXO ---
+        // --- WHATSAPP BLINDADO E DIRETO ---
         async function finalizarAgendamento() {
             const nome = document.getElementById('cliente-nome').value.trim();
             const whatsapp = document.getElementById('cliente-whatsapp').value.trim();
@@ -765,42 +765,41 @@
                 total: totalPreco
             };
 
+            // Tenta salvar no Supabase via backend, mas abre o WhatsApp de forma garantida
             try {
-                const res = await fetch(`${API_URL}/agendamentos`, {
+                await fetch(`${API_URL}/agendamentos`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-
-                if (res.ok) {
-                    // Limpa o número do WhatsApp do Studio (remove traços, parênteses e espaços)
-                    let studioWp = (appData.config && appData.config.whatsapp) ? String(appData.config.whatsapp).replace(/\D/g, '') : "5571999999999";
-                    
-                    // Garante o DDI 55 se o número vier apenas com DDD + telefone
-                    if (studioWp.length === 10 || studioWp.length === 11) {
-                        studioWp = '55' + studioWp;
-                    }
-
-                    const studioNome = appData.config.nome || 'Studio';
-                    const textoWp = encodeURIComponent(
-                        `Olá! Gostaria de confirmar meu agendamento no *${studioNome}*.\n\n` +
-                        `*Cliente:* ${nome}\n` +
-                        `*Data:* ${dataEscolhida} às ${horarioEscolhido}\n` +
-                        `*Serviços:* ${nomesServicos.join(', ')}\n` +
-                        `*Total:* R$ ${totalPreco.toFixed(2).replace('.', ',')}` +
-                        (obs ? `\n*Obs:* ${obs}` : '')
-                    );
-
-                    // Utiliza o link oficial seguro da API do WhatsApp
-                    window.open(`https://api.whatsapp.com/send?phone=${studioWp}&text=${textoWp}`, '_blank');
-                    window.location.reload();
-                } else {
-                    alert("Erro ao registrar agendamento.");
-                }
             } catch (err) {
-                console.error(err);
-                alert("Erro de conexão com o servidor.");
+                console.error("Aviso ao salvar no banco (o WhatsApp abrirá normalmente):", err);
             }
+
+            // Número do Studio limpo (remove caracteres especiais) e fallback seguro se vazio
+            let studioWp = (appData.config && appData.config.whatsapp) ? String(appData.config.whatsapp).replace(/\D/g, '') : "5571999999999";
+            if (studioWp.length === 10 || studioWp.length === 11) {
+                studioWp = '55' + studioWp;
+            }
+
+            const studioNome = appData.config.nome || 'Studio';
+            const textoWp = encodeURIComponent(
+                `Olá! Gostaria de confirmar meu agendamento no *${studioNome}*.\n\n` +
+                `*Cliente:* ${nome}\n` +
+                `*WhatsApp:* ${whatsapp}\n` +
+                `*Data:* ${dataEscolhida} às ${horarioEscolhido}\n` +
+                `*Serviços:* ${nomesServicos.join(', ')}\n` +
+                `*Total:* R$ ${totalPreco.toFixed(2).replace('.', ',')}` +
+                (obs ? `\n*Obs:* ${obs}` : '')
+            );
+
+            // Abre o link direto do WhatsApp (Funciona em computadores e telemóveis)
+            window.open(`https://api.whatsapp.com/send?phone=${studioWp}&text=${textoWp}`, '_blank');
+            
+            // Recarrega a página para limpar o carrinho
+            setTimeout(() => {
+                window.location.reload();
+            }, 800);
         }
 
         // 5. NAVEGAÇÃO DE TELAS E ADMIN
@@ -856,7 +855,7 @@
         function alternarAbaAdmin(aba) {
             ['agenda', 'servicos', 'config', 'galeria'].forEach(a => {
                 document.getElementById(`admin-tab-${a}`).classList.add('hidden');
-                document.getElementById(`tab-btn-${aba}`).className = "px-5 py-2.5 rounded-xl text-sm font-semibold bg-white text-nude-800 border border-nude-200 hover:bg-nude-50 transition-all";
+                document.getElementById(`tab-btn-${a}`).className = "px-5 py-2.5 rounded-xl text-sm font-semibold bg-white text-nude-800 border border-nude-200 hover:bg-nude-50 transition-all";
             });
             document.getElementById(`admin-tab-${aba}`).classList.remove('hidden');
             document.getElementById(`tab-btn-${aba}`).className = "px-5 py-2.5 rounded-xl text-sm font-semibold bg-nude-900 text-white transition-all shadow-sm";
