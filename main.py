@@ -61,7 +61,7 @@ class ConfigUpdate(BaseModel):
     whatsapp: Optional[str] = None
     bio: Optional[str] = None
     foto_perfil: Optional[str] = None
-    admin_senha: Optional[str] = None  # <--- Agora totalmente opcional para permitir salvar isoladamente
+    admin_senha: Optional[str] = None  # Opcional para permitir salvar isoladamente
 
 class GaleriaCreate(BaseModel):
     url: str
@@ -91,7 +91,7 @@ def update_config(config: ConfigUpdate):
     response = supabase.table("studio_config").update(data_dict).eq("id", 1).execute()
     return {"message": "Configurações atualizadas com sucesso", "data": response.data}
 
-# Rota específica para verificação de senha do Admin
+# Rota de verificação de senha estrita (Apenas 1 senha ativa por vez)
 @app.post("/api/admin/verify")
 def verify_admin(payload: dict):
     senha_digitada = payload.get("senha")
@@ -103,8 +103,8 @@ def verify_admin(payload: dict):
     
     senha_cadastrada = config_data.get("admin_senha") if config_data else "1234"
     
-    # Valida se a senha digitada bate com a cadastrada ou com a chave mestra '1234'
-    if senha_digitada == senha_cadastrada or senha_digitada == "1234":
+    # Compara estritamente com a senha atual guardada no banco de dados
+    if senha_digitada == senha_cadastrada:
         return {"verified": True}
     
     return {"verified": False}
