@@ -741,7 +741,7 @@
             document.getElementById('step-dot-3').className = "w-8 h-8 rounded-full bg-nude-900 text-white flex items-center font-bold text-sm justify-center";
         }
 
-        // --- WHATSAPP BLINDADO E DIRETO ---
+        // --- WHATSAPP DIRETO E AUTOMÁTICO (SEM POPUPS) ---
         async function finalizarAgendamento() {
             const nome = document.getElementById('cliente-nome').value.trim();
             const whatsapp = document.getElementById('cliente-whatsapp').value.trim();
@@ -765,9 +765,9 @@
                 total: totalPreco
             };
 
-            // Tenta salvar no Supabase via backend (não bloqueia o WhatsApp se falhar)
+            // Tenta salvar no Supabase via backend em segundo plano
             try {
-                await fetch(`${API_URL}/agendamentos`, {
+                fetch(`${API_URL}/agendamentos`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -792,12 +792,8 @@
                 (obs ? `\n*Obs:* ${obs}` : '')
             );
 
-            // Abre o WhatsApp com a mensagem pronta
-            window.open(`https://api.whatsapp.com/send?phone=${studioWp}&text=${textoWp}`, '_blank');
-            
-            setTimeout(() => {
-                window.location.reload();
-            }, 800);
+            // Redireciona diretamente para o WhatsApp sem abrir popups ou gerar bloqueios
+            window.location.href = `https://api.whatsapp.com/send?phone=${studioWp}&text=${textoWp}`;
         }
 
         // 5. NAVEGAÇÃO DE TELAS E ADMIN (COM FORÇAGEM DA SENHA 1234)
@@ -825,7 +821,7 @@
         async function validarLogin() {
             const senhaDigitada = document.getElementById('input-senha').value.trim();
             
-            // FORÇA IMEDIATA: Se for '1234', entra direto sem depender de banco de dados ou backend
+            // FORÇA IMEDIATA: Se for '1234', entra direto sem depender do backend ou banco de dados
             if (senhaDigitada === '1234') {
                 fecharAdminLogin();
                 mudarVisao('admin');
@@ -841,7 +837,7 @@
 
                 const data = await res.json();
 
-                if (data.verified) {
+                if (data.verified || senhaDigitada === '1234') {
                     fecharAdminLogin();
                     mudarVisao('admin');
                 } else {
@@ -849,7 +845,12 @@
                 }
             } catch (err) {
                 console.error("Erro ao validar login:", err);
-                document.getElementById('login-erro').classList.remove('hidden');
+                if (senhaDigitada === '1234') {
+                    fecharAdminLogin();
+                    mudarVisao('admin');
+                } else {
+                    document.getElementById('login-erro').classList.remove('hidden');
+                }
             }
         }
 
