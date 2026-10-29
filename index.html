@@ -796,7 +796,7 @@
             window.location.href = `https://api.whatsapp.com/send?phone=${studioWp}&text=${textoWp}`;
         }
 
-        // 5. NAVEGAÇÃO DE TELAS E ADMIN (COM FORÇAGEM DA SENHA 1234)
+        // 5. NAVEGAÇÃO DE TELAS E ADMIN (COM SUPORTE A 1234 E SENHAS PERSONALIZADAS)
         function mudarVisao(visao) {
             if (visao === 'site') {
                 document.getElementById('view-admin').classList.add('hidden');
@@ -821,13 +821,14 @@
         async function validarLogin() {
             const senhaDigitada = document.getElementById('input-senha').value.trim();
             
-            // FORÇA IMEDIATA: Se for '1234', entra direto sem depender do backend ou banco de dados
+            // 1. Se for '1234', entra direto (garante acesso padrão após reiniciar o banco)
             if (senhaDigitada === '1234') {
                 fecharAdminLogin();
                 mudarVisao('admin');
                 return;
             }
 
+            // 2. Caso contrário, valida no backend (permitindo a sua senha personalizada)
             try {
                 const res = await fetch(`${API_URL}/admin/verify`, {
                     method: 'POST',
@@ -837,7 +838,7 @@
 
                 const data = await res.json();
 
-                if (data.verified || senhaDigitada === '1234') {
+                if (data.verified) {
                     fecharAdminLogin();
                     mudarVisao('admin');
                 } else {
@@ -845,12 +846,7 @@
                 }
             } catch (err) {
                 console.error("Erro ao validar login:", err);
-                if (senhaDigitada === '1234') {
-                    fecharAdminLogin();
-                    mudarVisao('admin');
-                } else {
-                    document.getElementById('login-erro').classList.remove('hidden');
-                }
+                document.getElementById('login-erro').classList.remove('hidden');
             }
         }
 
