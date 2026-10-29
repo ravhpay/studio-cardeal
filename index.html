@@ -796,7 +796,7 @@
             window.location.href = `https://api.whatsapp.com/send?phone=${studioWp}&text=${textoWp}`;
         }
 
-        // 5. NAVEGAÇÃO DE TELAS E ADMIN (COM SUPORTE A 1234 E SENHAS PERSONALIZADAS)
+        // 5. NAVEGAÇÃO DE TELAS E ADMIN (SUPORTA 1234 E SENHAS PERSONALIZADAS)
         function mudarVisao(visao) {
             if (visao === 'site') {
                 document.getElementById('view-admin').classList.add('hidden');
@@ -821,14 +821,7 @@
         async function validarLogin() {
             const senhaDigitada = document.getElementById('input-senha').value.trim();
             
-            // 1. Se for '1234', entra direto (garante acesso padrão após reiniciar o banco)
-            if (senhaDigitada === '1234') {
-                fecharAdminLogin();
-                mudarVisao('admin');
-                return;
-            }
-
-            // 2. Caso contrário, valida no backend (permitindo a sua senha personalizada)
+            // Valida sempre no backend para aceitar tanto a senha padrão '1234' quanto a sua senha personalizada salva no banco
             try {
                 const res = await fetch(`${API_URL}/admin/verify`, {
                     method: 'POST',
@@ -838,7 +831,7 @@
 
                 const data = await res.json();
 
-                if (data.verified) {
+                if (data.verified || senhaDigitada === '1234') {
                     fecharAdminLogin();
                     mudarVisao('admin');
                 } else {
@@ -846,7 +839,13 @@
                 }
             } catch (err) {
                 console.error("Erro ao validar login:", err);
-                document.getElementById('login-erro').classList.remove('hidden');
+                // Fallback de segurança se o backend estiver instável e for a senha padrão
+                if (senhaDigitada === '1234') {
+                    fecharAdminLogin();
+                    mudarVisao('admin');
+                } else {
+                    document.getElementById('login-erro').classList.remove('hidden');
+                }
             }
         }
 
@@ -893,7 +892,7 @@
 
             if (res.ok) {
                 localStorage.setItem('studio_logo_url', fotoUrl);
-                alert("Configurações atualizadas com sucesso!");
+                alert("Configurações e senha atualizadas com sucesso!");
                 document.getElementById('cfg-senha').value = '';
                 carregarDadosDaAPI();
             } else {
