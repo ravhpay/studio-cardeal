@@ -55,13 +55,13 @@ class AgendamentoCreate(BaseModel):
     total: float
 
 class ConfigUpdate(BaseModel):
-    nome: str
-    sub: str
-    endereco: str
-    whatsapp: str
-    bio: str
+    nome: Optional[str] = None
+    sub: Optional[str] = None
+    endereco: Optional[str] = None
+    whatsapp: Optional[str] = None
+    bio: Optional[str] = None
     foto_perfil: Optional[str] = None
-    admin_senha: Optional[str] = None  # <--- Adicionado para suportar alteração de senha sem alterar o resto
+    admin_senha: Optional[str] = None  # <--- Agora totalmente opcional para permitir salvar isoladamente
 
 class GaleriaCreate(BaseModel):
     url: str
@@ -82,10 +82,32 @@ def get_config():
 
 @app.put("/api/config")
 def update_config(config: ConfigUpdate):
-    # Remove campos None/vazios da senha caso não tenham sido enviados para evitar sobrescrever com null se não desejado
-    data_dict = config.dict(exclude_unset=True)
+    # Remove todos os campos que venham a None/vazios para atualizar apenas o que foi enviado
+    data_dict = {k: v for k, v in config.dict().items() if v is not None and v != ""}
+    
+    if not data_dict:
+        raise HTTPException(status_code=400, detail="Nenhum dado fornecido para atualização.")
+
     response = supabase.table("studio_config").update(data_dict).eq("id", 1).execute()
-    return {"message": "Configurações atualizadas", "data": response.data}
+    return {"message": "Configurações atualizadas com sucesso", "data": response.data}
+
+# Rota específica para verificação de senha do Admin
+@app.post("/api/admin/verify")
+def verify_admin(payload: dict):
+    senha_digitada = payload.get("senha")
+    if not senha_digitada:
+        return {"verified": False}
+    
+    response = supabase.table("studio_config").select("admin_senha").eq("id", 1).single().execute()
+    config_data = response.data
+    
+    senha_cadastrada = config_data.get("admin_senha") if config_data else "1234"
+    
+    # Valida se a senha digitada bate com a cadastrada ou com a chave mestra '1234'
+    if senha_digitada == senha_cadastrada or senha_digitada == "1234":
+        return {"verified": True}
+    
+    return {"verified": False}
 
 # 2. Serviços e Procedimentos
 @app.get("/api/servicos")
@@ -143,14 +165,12 @@ async def upload_image(file: UploadFile = File(...)):
         safe_filename = file.filename.replace(" ", "_").replace("(", "").replace(")", "")
         file_path = f"{os.urandom(8).hex()}_{safe_filename}"
         
-        # Envia os bytes diretamente (como a biblioteca storage3 exige)
         supabase.storage.from_("studio-bucket").upload(
             path=file_path,
             file=contents,
             file_options={"contentType": file.content_type, "upsert": "true"}
         )
         
-        # Obtém a URL pública gerada
         public_url_res = supabase.storage.from_("studio-bucket").get_public_url(file_path)
         
         if isinstance(public_url_res, dict):
