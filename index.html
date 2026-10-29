@@ -455,10 +455,10 @@
         </div>
     </footer>
 
-    <!-- JAVASCRIPT INTEGRADO AO BACKEND FASTAPI (PYTHON) -->
+ <!-- JAVASCRIPT INTEGRADO AO BACKEND FASTAPI (PYTHON) -->
     <script>
-       const API_URL = 'https://studio-cardeal-1.onrender.com/api';
-        
+        const API_URL = 'https://studio-cardeal-1.onrender.com/api';
+         
         let appData = { config: {}, servicos: [], galeria: [], agendamentos: [] };
         let carrinhoServicos = [];
         let dataEscolhida = '';
@@ -466,7 +466,10 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             carregarDadosDaAPI();
-            document.getElementById('input-data').min = new Date().toISOString().split('T')[0];
+            const inputData = document.getElementById('input-data');
+            if (inputData) {
+                inputData.min = new Date().toISOString().split('T')[0];
+            }
         });
 
         // 1. BUSCAR DADOS DO BACKEND PYTHON
@@ -476,28 +479,27 @@
                 appData.config = await resConfig.json();
 
                 if (appData.config.foto_perfil) {
-                    document.getElementById('nav-logo-img').src = appData.config.foto_perfil;
-                    document.getElementById('hero-profile-img').src = appData.config.foto_perfil;
+                    if (document.getElementById('nav-logo-img')) document.getElementById('nav-logo-img').src = appData.config.foto_perfil;
+                    if (document.getElementById('hero-profile-img')) document.getElementById('hero-profile-img').src = appData.config.foto_perfil;
                     localStorage.setItem('studio_logo_url', appData.config.foto_perfil);
                 }
                 if (appData.config.nome) {
-                    document.getElementById('nav-studio-name').innerText = appData.config.nome;
-                    document.getElementById('hero-title').innerText = appData.config.nome;
-                    document.getElementById('footer-studio-name').innerText = appData.config.nome;
+                    if (document.getElementById('nav-studio-name')) document.getElementById('nav-studio-name').innerText = appData.config.nome;
+                    if (document.getElementById('hero-title')) document.getElementById('hero-title').innerText = appData.config.nome;
+                    if (document.getElementById('footer-studio-name')) document.getElementById('footer-studio-name').innerText = appData.config.nome;
                 }
                 if (appData.config.sub) {
-                    document.getElementById('nav-studio-sub').innerText = appData.config.sub;
-                    document.getElementById('hero-tag').innerText = appData.config.sub;
-                    document.getElementById('footer-studio-sub').innerText = appData.config.sub;
+                    if (document.getElementById('nav-studio-sub')) document.getElementById('nav-studio-sub').innerText = appData.config.sub;
+                    if (document.getElementById('hero-tag')) document.getElementById('hero-tag').innerText = appData.config.sub;
+                    if (document.getElementById('footer-studio-sub')) document.getElementById('footer-studio-sub').innerText = appData.config.sub;
                 }
                 if (appData.config.endereco) {
-                    document.getElementById('info-endereco').innerText = appData.config.endereco;
+                    if (document.getElementById('info-endereco')) document.getElementById('info-endereco').innerText = appData.config.endereco;
                 }
                 if (appData.config.bio) {
-                    document.getElementById('hero-desc').innerText = appData.config.bio;
+                    if (document.getElementById('hero-desc')) document.getElementById('hero-desc').innerText = appData.config.bio;
                 }
 
-                // Preenche os campos do formulário de configuração no admin com os valores atuais
                 if (document.getElementById('cfg-nome')) document.getElementById('cfg-nome').value = appData.config.nome || '';
                 if (document.getElementById('cfg-sub')) document.getElementById('cfg-sub').value = appData.config.sub || '';
                 if (document.getElementById('cfg-endereco')) document.getElementById('cfg-endereco').value = appData.config.endereco || '';
@@ -539,108 +541,112 @@
 
         // 3. RENDERIZAR INTERFACE DO SITE
         function renderizarSite() {
-            // Renderizar Serviços Públicos
             const containerServicos = document.getElementById('servicos-lista-publica');
-            containerServicos.innerHTML = '';
-
-            appData.servicos.forEach(srv => {
-                const selecionado = carrinhoServicos.some(s => s.id === srv.id);
-                containerServicos.innerHTML += `
-                    <div onclick="alternarServico(${srv.id})" class="cursor-pointer bg-white rounded-2xl p-5 border ${selecionado ? 'border-rosegold ring-2 ring-rosegold/20 bg-nude-50/50' : 'border-nude-200'} shadow-sm hover:border-rosegold transition-all flex items-center justify-between gap-4">
-                        <div class="flex items-center gap-4">
-                            <div class="w-16 h-16 rounded-xl overflow-hidden bg-nude-100 flex-shrink-0">
-                                <img src="${srv.foto || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=300&q=80'}" alt="${srv.nome}" class="w-full h-full object-cover">
+            if (containerServicos) {
+                containerServicos.innerHTML = '';
+                appData.servicos.forEach(srv => {
+                    const selecionado = carrinhoServicos.some(s => s.id === srv.id);
+                    containerServicos.innerHTML += `
+                        <div onclick="alternarServico(${srv.id})" class="cursor-pointer bg-white rounded-2xl p-5 border ${selecionado ? 'border-rosegold ring-2 ring-rosegold/20 bg-nude-50/50' : 'border-nude-200'} shadow-sm hover:border-rosegold transition-all flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 rounded-xl overflow-hidden bg-nude-100 flex-shrink-0">
+                                    <img src="${srv.foto || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=300&q=80'}" alt="${srv.nome}" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <span class="text-[10px] font-bold uppercase tracking-widest text-rosegold-dark">${srv.categoria}</span>
+                                    <h4 class="font-serif font-bold text-lg text-nude-900">${srv.nome}</h4>
+                                    <p class="text-xs text-neutral-500 mt-0.5 line-clamp-1">${srv.desc || ''}</p>
+                                    <p class="text-xs font-semibold text-neutral-700 mt-1"><i class="fa-regular fa-clock mr-1 text-rosegold"></i> ${srv.duracao} min</p>
+                                </div>
                             </div>
-                            <div>
-                                <span class="text-[10px] font-bold uppercase tracking-widest text-rosegold-dark">${srv.categoria}</span>
-                                <h4 class="font-serif font-bold text-lg text-nude-900">${srv.nome}</h4>
-                                <p class="text-xs text-neutral-500 mt-0.5 line-clamp-1">${srv.desc || ''}</p>
-                                <p class="text-xs font-semibold text-neutral-700 mt-1"><i class="fa-regular fa-clock mr-1 text-rosegold"></i> ${srv.duracao} min</p>
+                            <div class="text-right flex flex-col items-end gap-2">
+                                <span class="font-serif font-bold text-lg text-nude-900">R$ ${Number(srv.preco).toFixed(2).replace('.', ',')}</span>
+                                <div class="w-7 h-7 rounded-full ${selecionado ? 'bg-rosegold text-white' : 'border border-nude-300 text-transparent'} flex items-center justify-center text-xs transition-all">
+                                    <i class="fa-solid fa-check"></i>
+                                </div>
                             </div>
                         </div>
-                        <div class="text-right flex flex-col items-end gap-2">
-                            <span class="font-serif font-bold text-lg text-nude-900">R$ ${Number(srv.preco).toFixed(2).replace('.', ',')}</span>
-                            <div class="w-7 h-7 rounded-full ${selecionado ? 'bg-rosegold text-white' : 'border border-nude-300 text-transparent'} flex items-center justify-center text-xs transition-all">
-                                <i class="fa-solid fa-check"></i>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            // Renderizar Galeria Pública
-            const containerGaleria = document.getElementById('galeria-grid');
-            containerGaleria.innerHTML = '';
-            appData.galeria.forEach(foto => {
-                containerGaleria.innerHTML += `
-                    <div class="aspect-square rounded-2xl overflow-hidden shadow-sm border border-nude-200 group relative">
-                        <img src="${foto.url}" alt="${foto.legenda || 'Trabalho Studio'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
-                        ${foto.legenda ? `<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">${foto.legenda}</div>` : ''}
-                    </div>
-                `;
-            });
-
-            // Admin: Tabela de Agendamentos
-            const tabelaAgendamentos = document.getElementById('admin-tabela-agendamentos');
-            tabelaAgendamentos.innerHTML = '';
-            document.getElementById('admin-count-agendamentos').innerText = appData.agendamentos.length;
-
-            if (appData.agendamentos.length === 0) {
-                tabelaAgendamentos.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-neutral-400 text-xs">Nenhum agendamento registado ainda.</td></tr>`;
-            } else {
-                appData.agendamentos.forEach(ag => {
-                    tabelaAgendamentos.innerHTML += `
-                        <tr class="border-b border-nude-100 hover:bg-nude-50">
-                            <td class="py-3 px-4">
-                                <p class="font-bold text-nude-900">${ag.cliente}</p>
-                                <p class="text-xs text-neutral-500"><i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i> ${ag.whatsapp}</p>
-                                ${ag.obs ? `<p class="text-[11px] text-neutral-400 italic">Obs: ${ag.obs}</p>` : ''}
-                            </td>
-                            <td class="py-3 px-4 text-xs font-semibold text-neutral-700">${ag.data} às ${ag.horario}</td>
-                            <td class="py-3 px-4 text-xs text-neutral-600">${Array.isArray(ag.servicos) ? ag.servicos.join(', ') : ag.servicos}</td>
-                            <td class="py-3 px-4 font-bold text-nude-900">R$ ${Number(ag.total).toFixed(2).replace('.', ',')}</td>
-                            <td class="py-3 px-4">
-                                <button onclick="deletarAgendamento(${ag.id})" class="p-2 text-red-600 hover:bg-red-50 rounded-lg text-xs" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                        </tr>
                     `;
                 });
             }
 
-            // Admin: Lista de Serviços
+            const containerGaleria = document.getElementById('galeria-grid');
+            if (containerGaleria) {
+                containerGaleria.innerHTML = '';
+                appData.galeria.forEach(foto => {
+                    containerGaleria.innerHTML += `
+                        <div class="aspect-square rounded-2xl overflow-hidden shadow-sm border border-nude-200 group relative">
+                            <img src="${foto.url}" alt="${foto.legenda || 'Trabalho Studio'}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            ${foto.legenda ? `<div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-3 text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">${foto.legenda}</div>` : ''}
+                        </div>
+                    `;
+                });
+            }
+
+            const tabelaAgendamentos = document.getElementById('admin-tabela-agendamentos');
+            if (tabelaAgendamentos) {
+                tabelaAgendamentos.innerHTML = '';
+                document.getElementById('admin-count-agendamentos').innerText = appData.agendamentos.length;
+
+                if (appData.agendamentos.length === 0) {
+                    tabelaAgendamentos.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-neutral-400 text-xs">Nenhum agendamento registado ainda.</td></tr>`;
+                } else {
+                    appData.agendamentos.forEach(ag => {
+                        tabelaAgendamentos.innerHTML += `
+                            <tr class="border-b border-nude-100 hover:bg-nude-50">
+                                <td class="py-3 px-4">
+                                    <p class="font-bold text-nude-900">${ag.cliente}</p>
+                                    <p class="text-xs text-neutral-500"><i class="fa-brands fa-whatsapp text-emerald-600 mr-1"></i> ${ag.whatsapp}</p>
+                                    ${ag.obs ? `<p class="text-[11px] text-neutral-400 italic">Obs: ${ag.obs}</p>` : ''}
+                                </td>
+                                <td class="py-3 px-4 text-xs font-semibold text-neutral-700">${ag.data} às ${ag.horario}</td>
+                                <td class="py-3 px-4 text-xs text-neutral-600">${Array.isArray(ag.servicos) ? ag.servicos.join(', ') : ag.servicos}</td>
+                                <td class="py-3 px-4 font-bold text-nude-900">R$ ${Number(ag.total).toFixed(2).replace('.', ',')}</td>
+                                <td class="py-3 px-4">
+                                    <button onclick="deletarAgendamento(${ag.id})" class="p-2 text-red-600 hover:bg-red-50 rounded-lg text-xs" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+            }
+
             const adminListaServicos = document.getElementById('admin-lista-servicos');
-            adminListaServicos.innerHTML = '';
-            appData.servicos.forEach(srv => {
-                adminListaServicos.innerHTML += `
-                    <div class="bg-white rounded-2xl p-4 border border-nude-200 flex items-center justify-between gap-4">
-                        <div class="flex items-center gap-3">
-                            <img src="${srv.foto || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=300&q=80'}" class="w-12 h-12 rounded-xl object-cover">
-                            <div>
-                                <h4 class="font-bold text-sm text-nude-900">${srv.nome}</h4>
-                                <p class="text-xs text-neutral-500">R$ ${Number(srv.preco).toFixed(2)} • ${srv.duracao} min</p>
+            if (adminListaServicos) {
+                adminListaServicos.innerHTML = '';
+                appData.servicos.forEach(srv => {
+                    adminListaServicos.innerHTML += `
+                        <div class="bg-white rounded-2xl p-4 border border-nude-200 flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                                <img src="${srv.foto || 'https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&w=300&q=80'}" class="w-12 h-12 rounded-xl object-cover">
+                                <div>
+                                    <h4 class="font-bold text-sm text-nude-900">${srv.nome}</h4>
+                                    <p class="text-xs text-neutral-500">R$ ${Number(srv.preco).toFixed(2)} • ${srv.duracao} min</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="editarServico(${srv.id})" class="p-2 text-nude-800 hover:bg-nude-100 rounded-xl text-xs"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="deletarServico(${srv.id})" class="p-2 text-red-600 hover:bg-red-50 rounded-xl text-xs"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
-                        <div class="flex gap-2">
-                            <button onclick="editarServico(${srv.id})" class="p-2 text-nude-800 hover:bg-nude-100 rounded-xl text-xs"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deletarServico(${srv.id})" class="p-2 text-red-600 hover:bg-red-50 rounded-xl text-xs"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            }
 
-            // Admin: Lista de Galeria
             const adminListaGaleria = document.getElementById('admin-lista-galeria');
-            adminListaGaleria.innerHTML = '';
-            appData.galeria.forEach(foto => {
-                adminListaGaleria.innerHTML += `
-                    <div class="aspect-square rounded-2xl overflow-hidden border border-nude-200 relative group">
-                        <img src="${foto.url}" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <button onclick="deletarGaleria(${foto.id})" class="p-2.5 bg-red-600 text-white rounded-xl text-xs hover:bg-red-700"><i class="fa-solid fa-trash"></i></button>
+            if (adminListaGaleria) {
+                adminListaGaleria.innerHTML = '';
+                appData.galeria.forEach(foto => {
+                    adminListaGaleria.innerHTML += `
+                        <div class="aspect-square rounded-2xl overflow-hidden border border-nude-200 relative group">
+                            <img src="${foto.url}" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                <button onclick="deletarGaleria(${foto.id})" class="p-2.5 bg-red-600 text-white rounded-xl text-xs hover:bg-red-700"><i class="fa-solid fa-trash"></i></button>
+                            </div>
                         </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            }
         }
 
         // 4. FLUXO DE AGENDAMENTO E CARRINHO
@@ -668,10 +674,12 @@
             document.getElementById('total-duration').innerText = totalDuracao;
 
             const btnAvancar = document.getElementById('btn-avancar-1');
-            if (count > 0) {
-                btnAvancar.removeAttribute('disabled');
-            } else {
-                btnAvancar.setAttribute('disabled', 'true');
+            if (btnAvancar) {
+                if (count > 0) {
+                    btnAvancar.removeAttribute('disabled');
+                } else {
+                    btnAvancar.setAttribute('disabled', 'true');
+                }
             }
         }
 
@@ -722,7 +730,8 @@
             btn.className = "p-2.5 rounded-xl bg-nude-900 text-white text-xs font-semibold shadow-sm";
             horarioEscolhido = horario;
 
-            document.getElementById('btn-avancar-2').removeAttribute('disabled');
+            const btnAvancar2 = document.getElementById('btn-avancar-2');
+            if (btnAvancar2) btnAvancar2.removeAttribute('disabled');
         }
 
         function irParaPasso3() {
@@ -732,6 +741,7 @@
             document.getElementById('step-dot-3').className = "w-8 h-8 rounded-full bg-nude-900 text-white flex items-center font-bold text-sm justify-center";
         }
 
+        // --- CORREÇÃO DO WHATSAPP APLICADA ABAIXO ---
         async function finalizarAgendamento() {
             const nome = document.getElementById('cliente-nome').value.trim();
             const whatsapp = document.getElementById('cliente-whatsapp').value.trim();
@@ -763,9 +773,26 @@
                 });
 
                 if (res.ok) {
-                    const studioWp = appData.config.whatsapp || "5571999999999";
-                    const textoWp = encodeURIComponent(`Olá! Gostaria de confirmar meu agendamento no ${appData.config.nome || 'Studio'}.\n\n*Cliente:* ${nome}\n*Data:* ${dataEscolhida} às ${horarioEscolhido}\n*Serviços:* ${nomesServicos.join(', ')}\n*Total:* R$ ${totalPreco.toFixed(2)}`);
-                    window.open(`https://wa.me/${studioWp}?text=${textoWp}`, '_blank');
+                    // Limpa o número do WhatsApp do Studio (remove traços, parênteses e espaços)
+                    let studioWp = (appData.config && appData.config.whatsapp) ? String(appData.config.whatsapp).replace(/\D/g, '') : "5571999999999";
+                    
+                    // Garante o DDI 55 se o número vier apenas com DDD + telefone
+                    if (studioWp.length === 10 || studioWp.length === 11) {
+                        studioWp = '55' + studioWp;
+                    }
+
+                    const studioNome = appData.config.nome || 'Studio';
+                    const textoWp = encodeURIComponent(
+                        `Olá! Gostaria de confirmar meu agendamento no *${studioNome}*.\n\n` +
+                        `*Cliente:* ${nome}\n` +
+                        `*Data:* ${dataEscolhida} às ${horarioEscolhido}\n` +
+                        `*Serviços:* ${nomesServicos.join(', ')}\n` +
+                        `*Total:* R$ ${totalPreco.toFixed(2).replace('.', ',')}` +
+                        (obs ? `\n*Obs:* ${obs}` : '')
+                    );
+
+                    // Utiliza o link oficial seguro da API do WhatsApp
+                    window.open(`https://api.whatsapp.com/send?phone=${studioWp}&text=${textoWp}`, '_blank');
                     window.location.reload();
                 } else {
                     alert("Erro ao registrar agendamento.");
@@ -776,7 +803,7 @@
             }
         }
 
-        // 5. NAVEGAÇÃO DE TELAS E ADMIN (COM VALIDAÇÃO DE SENHA PERSONALIZADA)
+        // 5. NAVEGAÇÃO DE TELAS E ADMIN
         function mudarVisao(visao) {
             if (visao === 'site') {
                 document.getElementById('view-admin').classList.add('hidden');
@@ -798,17 +825,27 @@
             document.getElementById('login-erro').classList.add('hidden');
         }
 
-        function validarLogin() {
+        async function validarLogin() {
             const senhaDigitada = document.getElementById('input-senha').value;
             
-            // Verifica a senha personalizada salva no Supabase (appData.config.admin_senha), ou no localStorage, ou o padrão '1234'
-            const senhaOficial = (appData.config && appData.config.admin_senha) || localStorage.getItem('admin_custom_password') || '1234';
+            try {
+                const res = await fetch(`${API_URL}/admin/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ senha: senhaDigitada })
+                });
 
-            if (senhaDigitada === senhaOficial) {
-                fecharAdminLogin();
-                mudarVisao('admin');
-            } else {
-                document.getElementById('login-erro').classList.remove('hidden');
+                const data = await res.json();
+
+                if (data.verified) {
+                    fecharAdminLogin();
+                    mudarVisao('admin');
+                } else {
+                    document.getElementById('login-erro').classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error("Erro ao validar login:", err);
+                alert("Erro ao conectar com o servidor para validar a senha.");
             }
         }
 
@@ -819,13 +856,13 @@
         function alternarAbaAdmin(aba) {
             ['agenda', 'servicos', 'config', 'galeria'].forEach(a => {
                 document.getElementById(`admin-tab-${a}`).classList.add('hidden');
-                document.getElementById(`tab-btn-${a}`).className = "px-5 py-2.5 rounded-xl text-sm font-semibold bg-white text-nude-800 border border-nude-200 hover:bg-nude-50 transition-all";
+                document.getElementById(`tab-btn-${aba}`).className = "px-5 py-2.5 rounded-xl text-sm font-semibold bg-white text-nude-800 border border-nude-200 hover:bg-nude-50 transition-all";
             });
             document.getElementById(`admin-tab-${aba}`).classList.remove('hidden');
             document.getElementById(`tab-btn-${aba}`).className = "px-5 py-2.5 rounded-xl text-sm font-semibold bg-nude-900 text-white transition-all shadow-sm";
         }
 
-        // 6. FUNÇÕES DO PAINEL ADMIN (Config, Serviços, Galeria)
+        // 6. FUNÇÕES DO PAINEL ADMIN
         async function salvarConfiguracoesGerais() {
             const nome = document.getElementById('cfg-nome').value;
             const sub = document.getElementById('cfg-sub').value;
@@ -843,10 +880,8 @@
 
             const payload = { nome, sub, endereco, whatsapp, bio, foto_perfil: fotoUrl };
             
-            // Se o usuário digitou uma nova senha, inclui no payload para salvar no Supabase
             if (novaSenha && novaSenha.trim() !== "") {
                 payload.admin_senha = novaSenha.trim();
-                localStorage.setItem('admin_custom_password', novaSenha.trim());
             }
 
             const res = await fetch(`${API_URL}/config`, {
@@ -858,7 +893,7 @@
             if (res.ok) {
                 localStorage.setItem('studio_logo_url', fotoUrl);
                 alert("Configurações atualizadas com sucesso!");
-                document.getElementById('cfg-senha').value = ''; // Limpa o campo de senha por segurança
+                document.getElementById('cfg-senha').value = '';
                 carregarDadosDaAPI();
             } else {
                 alert("Erro ao atualizar configurações.");
