@@ -945,29 +945,30 @@
         }
 
         async function validarLogin() {
-            const senhaDigitada = document.getElementById('input-senha').value;
-            
-            try {
-                const response = await fetch(`${API_URL}/api/login`, { ... })
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ senha: senhaDigitada })
-                });
+    const senhaDigitada = document.getElementById('input-senha').value;
+    
+    try {
+        const response = await fetch(`${API_URL}/api/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ senha: senhaDigitada })
+        });
 
-                if (res.ok) {
-                    const data = await res.json();
-                    tokenAdmin = data.access_token;
-                    localStorage.setItem('admin_token', tokenAdmin);
-                    fecharAdminLogin();
-                    mudarVisao('admin');
-                } else {
-                    document.getElementById('login-erro').classList.remove('hidden');
-                }
-            } catch (err) {
-                console.error(err);
-                document.getElementById('login-erro').classList.remove('hidden');
-            }
+        if (response.ok) {
+            const data = await response.json();
+            tokenAdmin = data.access_token;
+            localStorage.setItem('admin_token', tokenAdmin);
+            fecharAdminLogin();
+            mudarVisao('admin');
+            carregarDadosDaAPI(); // Atualiza os dados administrativos
+        } else {
+            document.getElementById('login-erro').classList.remove('hidden');
         }
+    } catch (err) {
+        console.error(err);
+        document.getElementById('login-erro').classList.remove('hidden');
+    }
+}
 
         function logoutAdmin() {
             tokenAdmin = '';
