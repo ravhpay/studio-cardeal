@@ -987,34 +987,42 @@
 
         // 6. FUNÇÕES DO PAINEL ADMIN
         async function salvarConfiguracoesGerais() {
-            const nome = document.getElementById('cfg-nome').value;
-            const sub = document.getElementById('cfg-sub').value;
-            const endereco = document.getElementById('cfg-endereco').value;
-            const whatsapp = document.getElementById('cfg-whatsapp').value;
-            const bio = document.getElementById('cfg-bio').value;
-            const novaSenha = document.getElementById('cfg-senha').value;
-            const fileInput = document.getElementById('cfg-foto-file');
+    const nome = document.getElementById('cfg-nome').value;
+    const sub = document.getElementById('cfg-sub').value;
+    const endereco = document.getElementById('cfg-endereco').value;
+    const whatsapp = document.getElementById('cfg-whatsapp').value;
+    const bio = document.getElementById('cfg-bio').value;
+    const novaSenha = document.getElementById('cfg-senha').value;
+    const fileInput = document.getElementById('cfg-foto-file');
 
-            let fotoUrl = appData.config.foto_perfil;
-            if (fileInput.files.length > 0) {
-                const uploaded = await enviarImagemParaBackend(fileInput.files[0]);
-                if (uploaded) fotoUrl = uploaded;
-            }
+    let fotoUrl = appData.config.foto_perfil;
+    if (fileInput.files.length > 0) {
+        const uploaded = await enviarImagemParaBackend(fileInput.files[0]);
+        if (uploaded) fotoUrl = uploaded;
+    }
 
-            const payload = { nome, sub, endereco, whatsapp, bio, foto_perfil: fotoUrl };
-            if (novaSenha && novaSenha.trim() !== "") {
-                payload.admin_senha = novaSenha.trim();
-            }
+    const payload = { nome, sub, endereco, whatsapp, bio, foto_perfil: fotoUrl };
+    if (novaSenha && novaSenha.trim() !== "") {
+        payload.admin_senha = novaSenha.trim();
+    }
 
-            const res = await fetch(`${API_URL}/config`, {
-                method: 'PUT',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${tokenAdmin}`
-                },
-                body: JSON.stringify(payload)
-            });
+    const res = await fetch(`${API_URL}/api/config`, {
+        method: 'PUT',
+        headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${tokenAdmin}`
+        },
+        body: JSON.stringify(payload)
+    });
 
+    if (res.ok) {
+        alert('Configurações atualizadas com sucesso!');
+        carregarDadosDaAPI();
+    } else {
+        const errData = await res.json().catch(() => ({}));
+        alert('Erro ao atualizar configurações: ' + (errData.detail || 'Erro desconhecido'));
+    }
+}
             if (res.ok) {
                 localStorage.setItem('studio_logo_url', fotoUrl);
                 alert("Configurações atualizadas com sucesso!");
