@@ -535,10 +535,10 @@
         async function carregarDadosDaAPI() {
             try {
                 const [resConfig, resServicos, resGaleria, resBloqueios] = await Promise.all([
-                    fetch(`${API_URL}/config`).catch(() => null),
-                    fetch(`${API_URL}/servicos`).catch(() => null),
-                    fetch(`${API_URL}/galeria`).catch(() => null),
-                    fetch(`${API_URL}/bloqueios`).catch(() => null)
+                    fetch(`${API_URL}/api/config`).catch(() => null),
+                    fetch(`${API_URL}/api/servicos`).catch(() => null),
+                    fetch(`${API_URL}/api/galeria`).catch(() => null),
+                    fetch(`${API_URL}/api/bloqueios`).catch(() => null)
                 ]);
 
                 if (resConfig && resConfig.ok) {
@@ -559,7 +559,7 @@
                 }
 
                 if (tokenAdmin) {
-                    const resAgendamentos = await fetch(`${API_URL}/agendamentos`, {
+                    const resAgendamentos = await fetch(`${API_URL}/api/agendamentos`, {
                         headers: { 'Authorization': `Bearer ${tokenAdmin}` }
                     }).catch(() => null);
                     if (resAgendamentos && resAgendamentos.ok) {
@@ -610,7 +610,7 @@
             const formData = new FormData();
             formData.append("file", file);
 
-            const response = await fetch(`${API_URL}/upload`, {
+            const response = await fetch(`${API_URL}/api/upload`, {
                 method: "POST",
                 headers: { 'Authorization': `Bearer ${tokenAdmin}` },
                 body: formData
@@ -829,7 +829,7 @@
             // Busca os horários ocupados/bloqueados do backend para essa data
             let horariosOcupados = [];
             try {
-                const res = await fetch(`${API_URL}/horarios-ocupados/${inputData}`);
+                const res = await fetch(`${API_URL}/api/horarios-ocupados/${inputData}`);
                 if (res.ok) {
                     horariosOcupados = await res.json();
                 }
@@ -896,7 +896,7 @@
             };
 
             try {
-                const res = await fetch(`${API_URL}/agendamentos`, {
+                const res = await fetch(`${API_URL}/api/agendamentos`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -945,30 +945,30 @@
         }
 
         async function validarLogin() {
-    const senhaDigitada = document.getElementById('input-senha').value;
-    
-    try {
-        const response = await fetch(`${API_URL}/api/login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ senha: senhaDigitada })
-        });
+            const senhaDigitada = document.getElementById('input-senha').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/api/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ senha: senhaDigitada })
+                });
 
-        if (response.ok) {
-            const data = await response.json();
-            tokenAdmin = data.access_token;
-            localStorage.setItem('admin_token', tokenAdmin);
-            fecharAdminLogin();
-            mudarVisao('admin');
-            carregarDadosDaAPI(); // Atualiza os dados administrativos
-        } else {
-            document.getElementById('login-erro').classList.remove('hidden');
+                if (response.ok) {
+                    const data = await response.json();
+                    tokenAdmin = data.access_token;
+                    localStorage.setItem('admin_token', tokenAdmin);
+                    fecharAdminLogin();
+                    mudarVisao('admin');
+                    carregarDadosDaAPI();
+                } else {
+                    document.getElementById('login-erro').classList.remove('hidden');
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('login-erro').classList.remove('hidden');
+            }
         }
-    } catch (err) {
-        console.error(err);
-        document.getElementById('login-erro').classList.remove('hidden');
-    }
-}
 
         function logoutAdmin() {
             tokenAdmin = '';
@@ -986,50 +986,51 @@
         }
 
         // 6. FUNÇÕES DO PAINEL ADMIN
-       async function salvarConfiguracoesGerais() {
-    const nome = document.getElementById('cfg-nome').value;
-    const sub = document.getElementById('cfg-sub').value;
-    const endereco = document.getElementById('cfg-endereco').value;
-    const whatsapp = document.getElementById('cfg-whatsapp').value;
-    const bio = document.getElementById('cfg-bio').value;
-    const novaSenha = document.getElementById('cfg-senha').value;
-    const fileInput = document.getElementById('cfg-foto-file');
+        async function salvarConfiguracoesGerais() {
+            const nome = document.getElementById('cfg-nome').value;
+            const sub = document.getElementById('cfg-sub').value;
+            const endereco = document.getElementById('cfg-endereco').value;
+            const whatsapp = document.getElementById('cfg-whatsapp').value;
+            const bio = document.getElementById('cfg-bio').value;
+            const novaSenha = document.getElementById('cfg-senha').value;
+            const fileInput = document.getElementById('cfg-foto-file');
 
-    let fotoUrl = appData.config.foto_perfil;
-    if (fileInput.files.length > 0) {
-        const uploaded = await enviarImagemParaBackend(fileInput.files[0]);
-        if (uploaded) fotoUrl = uploaded;
-    }
+            let fotoUrl = appData.config.foto_perfil;
+            if (fileInput.files.length > 0) {
+                const uploaded = await enviarImagemParaBackend(fileInput.files[0]);
+                if (uploaded) fotoUrl = uploaded;
+            }
 
-    const payload = { nome, sub, endereco, whatsapp, bio, foto_perfil: fotoUrl };
-    if (novaSenha && novaSenha.trim() !== "") {
-        payload.admin_senha = novaSenha.trim();
-    }
+            const payload = { nome, sub, endereco, whatsapp, bio, foto_perfil: fotoUrl };
+            if (novaSenha && novaSenha.trim() !== "") {
+                payload.admin_senha = novaSenha.trim();
+            }
 
-    try {
-        const res = await fetch(`${API_URL}/api/config`, {
-            method: 'PUT',
-            headers: { 
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${tokenAdmin}`
-            },
-            body: JSON.stringify(payload)
-        });
+            try {
+                const res = await fetch(`${API_URL}/api/config`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${tokenAdmin}`
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-        if (res.ok) {
-            localStorage.setItem('studio_logo_url', fotoUrl);
-            alert('Configurações atualizadas com sucesso!');
-            document.getElementById('cfg-senha').value = '';
-            carregarDadosDaAPI();
-        } else {
-            const errData = await res.json().catch(() => ({}));
-            alert('Erro ao atualizar configurações: ' + (errData.detail || 'Erro desconhecido'));
+                if (res.ok) {
+                    localStorage.setItem('studio_logo_url', fotoUrl);
+                    alert('Configurações atualizadas com sucesso!');
+                    document.getElementById('cfg-senha').value = '';
+                    carregarDadosDaAPI();
+                } else {
+                    const errData = await res.json().catch(() => ({}));
+                    alert('Erro ao atualizar configurações: ' + (errData.detail || 'Erro desconhecido'));
+                }
+            } catch (err) {
+                console.error('Erro de conexão:', err);
+                alert('Erro ao conectar com o servidor para salvar.');
+            }
         }
-    } catch (err) {
-        console.error('Erro de conexão:', err);
-        alert('Erro ao conectar com o servidor para salvar.');
-    }
-}
+
         function abrirModalServico() {
             document.getElementById('modal-servico-titulo').innerText = "Novo Procedimento";
             document.getElementById('servico-edit-id').value = '';
@@ -1068,11 +1069,11 @@
 
             const payload = { nome, preco, duracao, categoria, desc, foto: fotoUrl };
 
-            let url = `${API_URL}/servicos`;
+            let url = `${API_URL}/api/servicos`;
             let method = 'POST';
 
             if (id) {
-                url = `${API_URL}/servicos/${id}`;
+                url = `${API_URL}/api/servicos/${id}`;
                 method = 'PUT';
             }
 
@@ -1108,7 +1109,7 @@
 
         async function deletarServico(id) {
             if (!confirm("Deseja eliminar este procedimento?")) return;
-            await fetch(`${API_URL}/servicos/${id}`, {
+            await fetch(`${API_URL}/api/servicos/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${tokenAdmin}` }
             });
@@ -1137,7 +1138,7 @@
             const url = await enviarImagemParaBackend(fileInput.files[0]);
             if (!url) return;
 
-            const res = await fetch(`${API_URL}/galeria`, {
+            const res = await fetch(`${API_URL}/api/galeria`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -1156,7 +1157,7 @@
 
         async function deletarGaleria(id) {
             if (!confirm("Deseja eliminar esta foto da galeria?")) return;
-            await fetch(`${API_URL}/galeria/${id}`, {
+            await fetch(`${API_URL}/api/galeria/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${tokenAdmin}` }
             });
@@ -1165,7 +1166,7 @@
 
         async function deletarAgendamento(id) {
             if (!confirm("Deseja eliminar este agendamento?")) return;
-            await fetch(`${API_URL}/agendamentos/${id}`, {
+            await fetch(`${API_URL}/api/agendamentos/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${tokenAdmin}` }
             });
@@ -1201,7 +1202,7 @@
                 motivo: motivo || "Folga"
             };
 
-            const res = await fetch(`${API_URL}/bloqueios`, {
+            const res = await fetch(`${API_URL}/api/bloqueios`, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json',
@@ -1220,7 +1221,7 @@
 
         async function deletarBloqueio(id) {
             if (!confirm("Deseja remover este bloqueio?")) return;
-            await fetch(`${API_URL}/bloqueios/${id}`, {
+            await fetch(`${API_URL}/api/bloqueios/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${tokenAdmin}` }
             });
