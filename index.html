@@ -117,13 +117,13 @@
                 </div>
                 <div class="w-10 h-0.5 bg-nude-200"></div>
                 <div class="flex items-center gap-2">
-                   <span id="step-dot-1" class="w-8 h-8 rounded-full bg-nude-900 text-white flex items-center font-bold text-sm justify-center">1</span>
-                    <span class="text-xs font-bold uppercase tracking-wider hidden sm:inline">Data & Hora</span>
+                    <span id="step-dot-2" class="w-8 h-8 rounded-full bg-nude-200 text-nude-800 flex items-center font-bold text-sm justify-center">2</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-neutral-400 hidden sm:inline">Data & Hora</span>
                 </div>
                 <div class="w-10 h-0.5 bg-nude-200"></div>
                 <div class="flex items-center gap-2">
-                   <span id="step-dot-1" class="w-8 h-8 rounded-full bg-nude-900 text-white flex items-center font-bold text-sm justify-center">1</span>
-                    <span class="text-xs font-bold uppercase tracking-wider hidden sm:inline">Seus Dados</span>
+                    <span id="step-dot-3" class="w-8 h-8 rounded-full bg-nude-200 text-nude-800 flex items-center font-bold text-sm justify-center">3</span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-neutral-400 hidden sm:inline">Seus Dados</span>
                 </div>
             </div>
 
@@ -473,23 +473,34 @@
         </div>
     </div>
 
-    <!-- MODAL DE BLOQUEIO -->
+    <!-- MODAL DE BLOQUEIO (ATUALIZADO: Intervalo de Datas e Todos os Horários) -->
     <div id="modal-bloqueio" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-nude-200">
-            <h3 class="font-serif text-2xl font-bold mb-4">Bloquear Data ou Horário</h3>
+            <h3 class="font-serif text-2xl font-bold mb-4">Bloquear Período ou Horário</h3>
             <div class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Data</label>
-                    <input type="date" id="blq-data" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Data Início</label>
+                        <input type="date" id="blq-data-inicio" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Data Fim (Opcional)</label>
+                        <input type="date" id="blq-data-fim" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm" placeholder="Para intervalo">
+                    </div>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Horário Específico (Opcional)</label>
-                    <input type="time" id="blq-horario" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm">
-                    <p class="text-[11px] text-neutral-400 mt-1">Deixe em branco para bloquear o **dia inteiro**.</p>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Horário / Período</label>
+                    <select id="blq-horario-tipo" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm mb-2" onchange="toggleHorarioEspecifico(this.value)">
+                        <option value="TODOS">Bloquear Todos os Horários (Dia Inteiro)</option>
+                        <option value="ESPECIFICO">Escolher um Horário Específico</option>
+                    </select>
+                    <div id="div-horario-especifico" class="hidden">
+                        <input type="time" id="blq-horario" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm">
+                    </div>
                 </div>
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-neutral-600 mb-1">Motivo (Opcional)</label>
-                    <input type="text" id="blq-motivo" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm" placeholder="Ex: Férias, Médico, Almoço...">
+                    <input type="text" id="blq-motivo" class="w-full p-3 rounded-xl border border-nude-200 bg-nude-50 text-sm" placeholder="Ex: Férias, Feriado, Almoço...">
                 </div>
                 <div class="flex gap-3 pt-4">
                     <button onclick="fecharModalBloqueio()" class="w-1/2 py-3 rounded-xl border border-nude-300 text-sm font-semibold">Cancelar</button>
@@ -750,7 +761,7 @@
                         tabelaBloqueios.innerHTML += `
                             <tr class="border-b border-nude-100 hover:bg-nude-50">
                                 <td class="py-3 px-4 font-bold text-nude-900">${b.data}</td>
-                                <td class="py-3 px-4 text-xs text-neutral-700">${b.horario_inicio ? `Às ${b.horario_inicio}` : 'Dia Inteiro'}</td>
+                                <td class="py-3 px-4 text-xs text-neutral-700">${b.horario_inicio ? `Às ${b.horario_inicio}` : 'Dia Inteiro (Todos os horários)'}</td>
                                 <td class="py-3 px-4 text-xs text-neutral-600">${b.motivo || 'Folga / Indisponível'}</td>
                                 <td class="py-3 px-4">
                                     <button onclick="deletarBloqueio(${b.id})" class="p-2 text-red-600 hover:bg-red-50 rounded-lg text-xs" title="Remover"><i class="fa-solid fa-trash"></i></button>
@@ -826,7 +837,6 @@
                 return;
             }
 
-            // Busca os horários ocupados/bloqueados do backend para essa data
             let horariosOcupados = [];
             try {
                 const res = await fetch(`${API_URL}/api/horarios-ocupados/${inputData}`);
@@ -1173,11 +1183,23 @@
             carregarDadosDaAPI();
         }
 
-        // Funções de Bloqueio
+        // 7. FUNÇÕES DE BLOQUEIO ATUALIZADAS (Intervalo de Datas + Todos os Horários)
         function abrirModalBloqueio() {
-            document.getElementById('blq-data').value = '';
-            document.getElementById('blq-horario').value = '';
-            document.getElementById('blq-motivo').value = '';
+            const elInicio = document.getElementById('blq-data-inicio');
+            const elFim = document.getElementById('blq-data-fim');
+            const elTipo = document.getElementById('blq-horario-tipo');
+            const elHorario = document.getElementById('blq-horario');
+            const elMotivo = document.getElementById('blq-motivo');
+
+            if (elInicio) elInicio.value = '';
+            if (elFim) elFim.value = '';
+            if (elTipo) elTipo.value = 'TODOS';
+            if (elHorario) elHorario.value = '';
+            if (elMotivo) elMotivo.value = '';
+            
+            const divEsp = document.getElementById('div-horario-especifico');
+            if (divEsp) divEsp.classList.add('hidden');
+
             document.getElementById('modal-bloqueio').classList.remove('hidden');
         }
 
@@ -1185,47 +1207,76 @@
             document.getElementById('modal-bloqueio').classList.add('hidden');
         }
 
+        function toggleHorarioEspecifico(valor) {
+            const divEspecifico = document.getElementById('div-horario-especifico');
+            if (divEspecifico) {
+                if (valor === 'ESPECIFICO') {
+                    divEspecifico.classList.remove('hidden');
+                } else {
+                    divEspecifico.classList.add('hidden');
+                }
+            }
+        }
+
         async function salvarBloqueio() {
-            const data = document.getElementById('blq-data').value;
-            const horario = document.getElementById('blq-horario').value;
+            const dataInicio = document.getElementById('blq-data-inicio').value;
+            const dataFim = document.getElementById('blq-data-fim').value;
+            const tipoHorario = document.getElementById('blq-horario-tipo').value;
+            const horarioEspecifico = document.getElementById('blq-horario').value;
             const motivo = document.getElementById('blq-motivo').value;
 
-            if (!data) {
-                alert("Por favor, selecione a data.");
+            if (!dataInicio) {
+                alert("Por favor, selecione ao menos a data inicial.");
                 return;
             }
 
             const payload = {
-                data: data,
-                horario_inicio: horario ? horario : null,
+                data_inicio: dataInicio,
+                data_fim: dataFim ? dataFim : null,
+                horario_inicio: tipoHorario === 'TODOS' ? 'TODOS' : (horarioEspecifico || null),
                 horario_fim: null,
-                motivo: motivo || "Folga"
+                motivo: motivo || "Folga / Férias"
             };
 
-            const res = await fetch(`${API_URL}/api/bloqueios`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${tokenAdmin}`
-                },
-                body: JSON.stringify(payload)
-            });
+            try {
+                const res = await fetch(`${API_URL}/api/bloqueios`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${tokenAdmin}`
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-            if (res.ok) {
-                fecharModalBloqueio();
-                carregarDadosDaAPI();
-            } else {
-                alert("Erro ao criar bloqueio.");
+                if (res.ok) {
+                    fecharModalBloqueio();
+                    carregarDadosDaAPI();
+                    alert("Bloqueio aplicado com sucesso!");
+                } else {
+                    const err = await res.json().catch(() => ({}));
+                    alert("Erro ao criar bloqueio: " + (err.detail || 'Erro desconhecido'));
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Erro de conexão ao salvar bloqueio.");
             }
         }
 
         async function deletarBloqueio(id) {
             if (!confirm("Deseja remover este bloqueio?")) return;
-            await fetch(`${API_URL}/api/bloqueios/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${tokenAdmin}` }
-            });
-            carregarDadosDaAPI();
+            try {
+                const res = await fetch(`${API_URL}/api/bloqueios/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${tokenAdmin}` }
+                });
+                if (res.ok) {
+                    carregarDadosDaAPI();
+                } else {
+                    alert("Erro ao remover bloqueio.");
+                }
+            } catch (e) {
+                console.error(e);
+            }
         }
     </script>
 </body>
