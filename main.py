@@ -72,7 +72,6 @@ def gerar_hash_senha(senha: str) -> str:
     return pwd_context.hash(senha)
 
 def verificar_senha(senha_plana: str, senha_hash: str) -> bool:
-    # Permite aceitar senha em texto plano (como '1234') ou hash bcrypt gerado posteriormente
     if senha_plana == senha_hash:
         return True
     if not senha_hash.startswith("$2b$"):
@@ -138,9 +137,10 @@ class GaleriaCreate(BaseModel):
     legenda: Optional[str] = None
 
 class BloqueioCreate(BaseModel):
-    data: str  # Formato: YYYY-MM-DD
-    horario_inicio: Optional[str] = None  # Ex: "12:00"
-    horario_fim: Optional[str] = None     # Ex: "13:00"
+    data_inicio: str  # Formato: YYYY-MM-DD
+    data_fim: Optional[str] = None  # Formato: YYYY-MM-DD (para intervalo de dias/semana/mês)
+    horario_inicio: Optional[str] = None  # "TODOS" ou ex: "12:00"
+    horario_fim: Optional[str]     = None
     motivo: Optional[str] = None
 
 # --- Endpoints ---
@@ -264,15 +264,12 @@ def get_agendamentos():
 @app.get("/api/horarios-ocupados/{data}")
 def get_horarios_ocupados(data: str):
     try:
-        # Busca agendamentos marcados
         res_ag = supabase.table("agendamentos").select("horario").eq("data", data).execute()
         horarios = [item["horario"] for item in res_ag.data]
 
-        # Busca bloqueios/folgas para esta data
         res_blq = supabase.table("bloqueios").select("*").eq("data", data).execute()
         for blq in res_blq.data:
-            if not blq.get("horario_inicio"):
-                # Se horário_inicio for nulo, bloqueia o dia inteiro (todos os horários fixos)
+            if not blq.get("horario_inicio") or blq.get("horario_inicio") == "TODOS":
                 horarios.extend(['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'])
             else:
                 horarios.append(blq["horario_inicio"])
@@ -311,7 +308,7 @@ def delete_agendamento(agendamento_id: int):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-# --- Rotas de Bloqueios & Folgas ---
+# --- Rotas de Bloqueios & Folgas (Com Intervalo de Datas e Todos os Horários) ---
 @app.get("/api/bloqueios")
 def get_bloqueios():
     try:
@@ -323,9 +320,35 @@ def get_bloqueios():
 @app.post("/api/bloqueios", dependencies=[Depends(verificar_admin)])
 def create_bloqueio(bloqueio: BloqueioCreate):
     try:
-        response = supabase.table("bloqueios").insert(bloqueio.model_dump()).execute()
-        return {"message": "Bloqueio criado com sucesso", "data": response.data}
+        d_inicio = datetime.strptime(bloqueio.data_inicio, "%Y-%m-%d")
+        d_fim = datetime.strptime(bloqueio.data_fim, "%Y-%m-%d") if bloqueio.data_fim else d_inicio
+        
+        if d_fim < d_inicio:
+            raise HTTPException(status_code=400, detail="A data final nao pode ser anterior a data inicial.")
+            
+        current_date = d_inicio
+        registros_inseridos = []
+        
+        while current_date <= d_fim:
+            data_str = current_date.strftime("%Y-%m-%d")
+            
+            payload = {
+                "data": data_str,
+                "horario_inicio": None if bloqueio.horario_inicio == "TODOS" else bloqueio.horario_inicio,
+                "horario_fim": bloqueio.horario_fim,
+                "motivo": bloqueio.motivo or "Folga / Ferias"
+            }
+            
+            response = supabase.table("bloqueios").insert(payload).execute()
+            if response.data:
+                registros_inseridos.extend(response.data)
+            current_date += timedelta(days=1)
+            
+        return {"message": "Bloqueios criados com sucesso", "data": registros_inseridos}
+    except HTTPException:
+        raise
     except Exception as e:
+        traceback.print_exc()
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.delete("/api/bloqueios/{bloqueio_id}", dependencies=[Depends(verificar_admin)])
